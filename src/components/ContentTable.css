@@ -1,0 +1,263 @@
+/* 表格整体样式 */
+.content-table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.content-table .ant-table {
+  background: var(--bg-color);
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+
+/* 表头样式 */
+.content-table .ant-table-thead > tr > th {
+  background: var(--primary-color);
+  color: var(--bg-color);
+  font-weight: 600;
+  border-bottom: none;
+  padding: 12px;
+  font-size: 13px;
+  transition: all 0.3s ease;
+}
+
+.content-table .ant-table-thead > tr > th::before {
+  display: none;
+}
+
+/* 表格行样式 */
+.content-table .ant-table-tbody > tr {
+  transition: all 0.3s ease;
+  background: var(--bg-color);
+}
+
+.content-table .ant-table-tbody > tr:hover {
+  background: var(--hover-bg);
+  box-shadow: 0 2px 8px var(--card-shadow);
+  transform: translateY(-2px);
+}
+
+.content-table .ant-table-tbody > tr > td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+/* 斑马纹效果 */
+.content-table .ant-table-tbody > tr:nth-child(even) {
+  background: var(--secondary-bg);
+}
+
+.content-table .ant-table-tbody > tr:nth-child(even):hover {
+  background: var(--hover-bg);
+}
+
+/* 标题单元格 */
+.title-cell {
+  max-width: 500px;
+}
+
+.title-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.3s ease;
+}
+
+.author-info {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  transition: color 0.3s ease;
+}
+
+.fans-count {
+  margin-left: 8px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.keywords-wrapper {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.keywords-label {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  transition: color 0.3s ease;
+}
+
+.keyword-tag {
+  margin: 0;
+  font-size: 12px;
+  background: var(--tertiary-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.keyword-separator {
+  color: var(--text-tertiary);
+  margin: 0 2px;
+  transition: color 0.3s ease;
+}
+
+/* 数字单元格 */
+.number-cell {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: color 0.3s ease;
+}
+
+/* 时间单元格 */
+.time-cell {
+  font-size: 12px;
+  color: var(--text-secondary);
+  transition: color 0.3s ease;
+}
+
+/* 分页样式 */
+.content-table .ant-pagination {
+  margin: 16px 0 8px;
+}
+
+.content-table .ant-pagination-item {
+  background: var(--bg-color);
+  border-color: var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.content-table .ant-pagination-item a {
+  color: var(--text-primary);
+  transition: color 0.3s ease;
+}
+
+.content-table .ant-pagination-item-active {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.content-table .ant-pagination-item-active a {
+  color: var(--bg-color);
+}
+
+.content-table .ant-pagination-item:hover {
+  border-color: var(--primary-color);
+}
+
+.content-table .ant-pagination-item:hover a {
+  color: var(--primary-color);
+}
+
+/* 操作按钮 */
+.content-table .ant-btn-link {
+  color: var(--text-primary);
+  padding: 0 8px;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+
+.content-table .ant-btn-link:hover {
+  color: var(--text-secondary);
+}
+
+/* 操作列Space容器 */
+.content-table .ant-space {
+  white-space: normal;
+}
+
+/* Tag 样式 */
+.platform-tag,
+.category-tag {
+  background: var(--tertiary-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+/* 响应式表格 */
+@media screen and (max-width: 1200px) {
+  .content-table .ant-table-thead > tr > th,
+  .content-table .ant-table-tbody > tr > td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .title-cell {
+    max-width: 400px;
+  }
+
+  .title-text {
+    font-size: 12px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .content-table {
+    overflow-x: auto;
+  }
+
+  .content-table .ant-table {
+    min-width: 1000px;
+  }
+
+  .content-table .ant-table-thead > tr > th,
+  .content-table .ant-table-tbody > tr > td {
+    padding: 8px 6px;
+    font-size: 11px;
+  }
+
+  .title-cell {
+    max-width: 300px;
+  }
+
+  .title-text {
+    font-size: 11px;
+  }
+
+  .author-info,
+  .keywords-label,
+  .keyword-tag {
+    font-size: 10px;
+  }
+
+  .number-cell {
+    font-size: 12px;
+  }
+
+  .time-cell {
+    font-size: 10px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .content-table .ant-table-thead > tr > th,
+  .content-table .ant-table-tbody > tr > td {
+    padding: 6px 4px;
+    font-size: 10px;
+  }
+
+  .title-cell {
+    max-width: 200px;
+  }
+
+  .content-table .ant-pagination {
+    margin: 12px 0 6px;
+  }
+
+  .content-table .ant-btn-link {
+    padding: 0 4px;
+    font-size: 10px;
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "wechat_index": {
+    "openid": "你的微信openid",
+    "search_key": "你的search_key(每天需要更新)",
+    "keywords": [
+      "人工智能",
+      "ChatGPT",
+      "AIGC",
+      "大模型",
+      "机器学习",
+      "深度学习",
+      "自然语言处理"
+    ],
+    "request_delay": 1.5,
+    "comment": "openid和search_key需要通过抓包获取,详见README.md"
+  },
+  "database": {
+    "type": "sqlite",
+    "path": "wechat_index.db",
+    "comment": "如需使用MySQL,请修改为相应配置"
+  },
+  "schedule": {
+    "enabled": true,
+    "time": "09:00",
+    "comment": "每天定时采集时间(24小时制)"
+  }
+}
