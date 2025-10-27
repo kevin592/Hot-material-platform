@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table, Tag, Button, Space, message } from 'antd';
-import { EyeOutlined, LinkOutlined, RobotOutlined } from '@ant-design/icons';
+import { EyeOutlined, LinkOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { ContentItem } from '../types';
 import { formatNumber, copyToClipboard } from '../utils';
@@ -13,7 +13,6 @@ interface ContentTableProps {
   current: number;
   pageSize: number;
   onPageChange: (page: number, pageSize: number) => void;
-  onAICreate?: (title: string) => void;
 }
 
 const ContentTable: React.FC<ContentTableProps> = ({
@@ -22,8 +21,7 @@ const ContentTable: React.FC<ContentTableProps> = ({
   total,
   current,
   pageSize,
-  onPageChange,
-  onAICreate
+  onPageChange
 }) => {
   const handleCopyLink = async (url: string) => {
     const success = await copyToClipboard(url);
@@ -36,14 +34,6 @@ const ContentTable: React.FC<ContentTableProps> = ({
 
   const handleView = (url: string) => {
     window.open(url, '_blank');
-  };
-
-  const handleAICreateClick = (title: string) => {
-    if (onAICreate) {
-      onAICreate(title);
-    } else {
-      message.info('AI创作功能即将开放');
-    }
   };
 
   const columns: ColumnsType<ContentItem> = [
@@ -159,12 +149,9 @@ const ContentTable: React.FC<ContentTableProps> = ({
     {
       title: '操作',
       key: 'action',
-      width: '18%',
+      width: '10%',
       render: (_: any, record: ContentItem) => (
         <Space size="small" wrap>
-          <Button type="link" size="small" icon={<RobotOutlined />} onClick={() => handleAICreateClick(record.title)}>
-            AI创作
-          </Button>
           <Button type="link" size="small" icon={<EyeOutlined />} onClick={() => handleView(record.url)}>
             查看
           </Button>

@@ -23,6 +23,12 @@
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
+
+  /* 补充缺失的变量别名 (用于兼容组件CSS) */
+  --bg-color: var(--bg-primary);
+  --primary-color: var(--accent-color);
+  --primary-hover: var(--accent-hover);
+  --card-shadow: rgba(0, 0, 0, 0.06);
 }
 
 body {

@@ -3,7 +3,6 @@ import { message, Empty, Button, Result } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import FilterPanel from '../components/FilterPanel';
 import ContentTable from '../components/ContentTable';
-import AIEditor from './AIEditor';
 import { searchHotContent } from '../api/request';
 import type { FilterParams, ContentItem, SearchParams } from '../types';
 import { getTimeRange } from '../utils';
@@ -30,21 +29,6 @@ const ContentListPage: React.FC<ContentListPageProps> = ({ postType }) => {
   const [pageSize, setPageSize] = useState(20);
   const [searchId, setSearchId] = useState('');
   const [error, setError] = useState<{ type: string; message: string } | null>(null);
-
-  // AI创作相关状态
-  const [showAIEditor, setShowAIEditor] = useState(false);
-  const [selectedTopic, setSelectedTopic] = useState('');
-
-  // 前端粉丝量过滤函数
-  const filterDataByFans = (data: ContentItem[], fansLimit: string): ContentItem[] => {
-    if (!fansLimit) return data;
-
-    const [min, max] = fansLimit.split('-').map(Number);
-    return data.filter(item => {
-      const fans = parseInt(item.fans.replace(/,/g, ''));
-      return fans >= min && fans <= max;
-    });
-  };
 
   // 构建搜索参数
   const buildSearchParams = (): SearchParams => {
@@ -132,24 +116,6 @@ const ContentListPage: React.FC<ContentListPageProps> = ({ postType }) => {
     setPageSize(pageSize);
   };
 
-  const handleAICreate = (title: string) => {
-    setSelectedTopic(title);
-    setShowAIEditor(true);
-  };
-
-  const handleBackToList = () => {
-    setShowAIEditor(false);
-    setSelectedTopic('');
-  };
-
-  // 应用前端过滤
-  const filteredData = filterDataByFans(data, filters.fansLimit || '');
-
-  // 如果正在AI创作，显示编辑器
-  if (showAIEditor) {
-    return <AIEditor topic={selectedTopic} onBack={handleBackToList} />;
-  }
-
   return (
     <div>
       <FilterPanel
@@ -191,13 +157,12 @@ const ContentListPage: React.FC<ContentListPageProps> = ({ postType }) => {
         ) : (
           // 正常数据展示
           <ContentTable
-            data={filteredData}
+            data={data}
             loading={loading}
             total={total}
             current={current}
             pageSize={pageSize}
             onPageChange={handlePageChange}
-            onAICreate={handleAICreate}
           />
         )}
       </div>
