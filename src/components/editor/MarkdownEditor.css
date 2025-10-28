@@ -1,0 +1,172 @@
+.markdown-editor {
+  height: 100%;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 15px;
+  overflow: hidden;
+}
+
+.markdown-editor .cm-editor {
+  height: 100%;
+  background: #ffffff;
+}
+
+.markdown-editor .cm-scroller {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+  line-height: 1.7;
+  font-size: 15px;
+}
+
+.markdown-editor .cm-content {
+  padding: 40px 60px;
+  caret-color: #1890ff;
+}
+
+.markdown-editor .cm-line {
+  padding: 2px 0;
+}
+
+/* 选中文本样式 */
+.markdown-editor .cm-selectionBackground {
+  background-color: #d1e9ff !important;
+}
+
+/* 光标样式 */
+.markdown-editor .cm-cursor {
+  border-left: 2px solid #1890ff;
+}
+
+/* 显示行号 */
+.markdown-editor .cm-gutters {
+  background-color: #fafafa;
+  border-right: 1px solid #e8e8e8;
+  color: #999;
+  padding: 0 8px;
+}
+
+/* 当前行高亮 */
+.markdown-editor .cm-activeLine {
+  background-color: rgba(24, 144, 255, 0.05);
+}
+
+/* Markdown 语法高亮 - 标题 */
+.markdown-editor .cm-header {
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.markdown-editor .cm-header.cm-header-1 {
+  color: #d73a49;
+  font-size: 1.8em;
+}
+
+.markdown-editor .cm-header.cm-header-2 {
+  color: #e36209;
+  font-size: 1.5em;
+}
+
+.markdown-editor .cm-header.cm-header-3 {
+  color: #6f42c1;
+  font-size: 1.3em;
+}
+
+.markdown-editor .cm-header.cm-header-4 {
+  color: #0366d6;
+  font-size: 1.1em;
+}
+
+.markdown-editor .cm-header.cm-header-5 {
+  color: #22863a;
+  font-size: 1em;
+}
+
+.markdown-editor .cm-header.cm-header-6 {
+  color: #6a737d;
+  font-size: 0.95em;
+}
+
+/* 加粗 */
+.markdown-editor .cm-strong {
+  font-weight: 700;
+  color: #005cc5;
+}
+
+/* 斜体 */
+.markdown-editor .cm-em {
+  font-style: italic;
+  color: #22863a;
+}
+
+/* 链接 */
+.markdown-editor .cm-link {
+  color: #0366d6;
+  text-decoration: underline;
+}
+
+/* URL */
+.markdown-editor .cm-url {
+  color: #032f62;
+}
+
+/* 行内代码 */
+.markdown-editor .cm-code {
+  background-color: rgba(175, 184, 193, 0.2);
+  color: #e83e8c;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.9em;
+}
+
+/* 列表标记 */
+.markdown-editor .cm-list {
+  color: #d73a49;
+  font-weight: 600;
+}
+
+/* 引用块 */
+.markdown-editor .cm-quote {
+  color: #6a737d;
+  font-style: italic;
+  border-left: 3px solid #dfe2e5;
+  padding-left: 10px;
+}
+
+/* 水平线 */
+.markdown-editor .cm-hr {
+  color: #d1d5da;
+  font-weight: bold;
+}
+
+/* 图片标记 */
+.markdown-editor .cm-image {
+  color: #22863a;
+}
+
+.markdown-editor .cm-image-mark {
+  color: #d73a49;
+}
+
+/* 删除线 */
+.markdown-editor .cm-strikethrough {
+  text-decoration: line-through;
+  color: #6a737d;
+}
+
+/* 编辑器滚动条 */
+.markdown-editor .cm-scroller::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.markdown-editor .cm-scroller::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.markdown-editor .cm-scroller::-webkit-scrollbar-thumb {
+  background: #d0d0d0;
+  border-radius: 4px;
+}
+
+.markdown-editor .cm-scroller::-webkit-scrollbar-thumb:hover {
+  background: #b0b0b0;
+}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Layout, Menu, ConfigProvider } from 'antd';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { Layout, Menu, ConfigProvider, App as AntdApp } from 'antd';
 import {
   FireOutlined,
   FolderOutlined,
@@ -15,6 +16,7 @@ import {
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import ContentListPage from './pages/ContentListPage';
+import EditorPage from './pages/EditorPage';
 import './App.css';
 
 const { Header, Sider, Content } = Layout;
@@ -38,51 +40,66 @@ const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
   </div>
 );
 
+// 主题配置 - 固定为浅色主题
+const themeConfig = {
+  token: {
+    colorPrimary: '#228be6',
+    colorBgContainer: '#ffffff',
+    colorBorder: '#dee2e6',
+    colorText: '#212529',
+    colorTextSecondary: '#495057',
+    colorBgElevated: '#ffffff',
+    borderRadius: 8,
+    fontSize: 14,
+  },
+  components: {
+    Layout: {
+      headerBg: '#ffffff',
+      siderBg: '#ffffff',
+      bodyBg: '#f8f9fa',
+    },
+    Menu: {
+      itemBg: 'transparent',
+      itemSelectedBg: '#228be6',
+      itemSelectedColor: '#ffffff',
+      itemHoverBg: '#f8f9fa',
+      itemHoverColor: '#212529',
+      itemColor: '#495057',
+    },
+    Button: {
+      primaryColor: '#ffffff',
+    },
+    Radio: {
+      buttonSolidCheckedBg: '#228be6',
+      buttonSolidCheckedColor: '#ffffff',
+      colorPrimary: '#228be6',
+    },
+    Table: {
+      colorText: '#212529',
+      colorTextHeading: '#212529',
+      headerBg: '#f8f9fa',
+    },
+  },
+};
+
 const App: React.FC = () => {
+  const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKey, setSelectedKey] = useState('discover');
 
-  // 主题配置 - 固定为浅色主题
-  const themeConfig = {
-    token: {
-      colorPrimary: '#228be6',
-      colorBgContainer: '#ffffff',
-      colorBorder: '#dee2e6',
-      colorText: '#212529',
-      colorTextSecondary: '#495057',
-      colorBgElevated: '#ffffff',
-      borderRadius: 8,
-      fontSize: 14,
-    },
-    components: {
-      Layout: {
-        headerBg: '#ffffff',
-        siderBg: '#ffffff',
-        bodyBg: '#f8f9fa',
-      },
-      Menu: {
-        itemBg: 'transparent',
-        itemSelectedBg: '#228be6',
-        itemSelectedColor: '#ffffff',
-        itemHoverBg: '#f8f9fa',
-        itemHoverColor: '#212529',
-        itemColor: '#495057',
-      },
-      Button: {
-        primaryColor: '#ffffff',
-      },
-      Radio: {
-        buttonSolidCheckedBg: '#228be6',
-        buttonSolidCheckedColor: '#ffffff',
-        colorPrimary: '#228be6',
-      },
-      Table: {
-        colorText: '#212529',
-        colorTextHeading: '#212529',
-        headerBg: '#f8f9fa',
-      },
-    },
-  };
+  // 检测是否在编辑器路由
+  const isEditorPage = location.pathname === '/editor';
+
+  // 如果是编辑器页面,直接渲染编辑器
+  if (isEditorPage) {
+    return (
+      <ConfigProvider theme={themeConfig}>
+        <AntdApp>
+          <EditorPage />
+        </AntdApp>
+      </ConfigProvider>
+    );
+  }
 
   const menuItems: MenuItem[] = [
     {
@@ -198,39 +215,41 @@ const App: React.FC = () => {
 
   return (
     <ConfigProvider theme={themeConfig}>
-      <Layout className="app-layout">
-        {/* 顶部导航栏 */}
-        <Header className="top-navbar">
-          <div className="navbar-content">
-            <div className="navbar-logo">
-              <FireOutlined className="logo-icon" />
-              <span className="logo-text">热门素材管理平台</span>
+      <AntdApp>
+        <Layout className="app-layout">
+          {/* 顶部导航栏 */}
+          <Header className="top-navbar">
+            <div className="navbar-content">
+              <div className="navbar-logo">
+                <FireOutlined className="logo-icon" />
+                <span className="logo-text">热门素材管理平台</span>
+              </div>
             </div>
-          </div>
-        </Header>
+          </Header>
 
-        {/* 主体布局 */}
-        <Layout className="main-layout">
-          <Sider
-            collapsible
-            collapsed={collapsed}
-            onCollapse={setCollapsed}
-            className="app-sider"
-            width={220}
-          >
-            <Menu
-              mode="inline"
-              selectedKeys={[selectedKey]}
-              items={menuItems}
-              onClick={handleMenuClick}
-              className="sidebar-menu"
-            />
-          </Sider>
-          <Content className="app-content">
-            {renderContent()}
-          </Content>
+          {/* 主体布局 */}
+          <Layout className="main-layout">
+            <Sider
+              collapsible
+              collapsed={collapsed}
+              onCollapse={setCollapsed}
+              className="app-sider"
+              width={220}
+            >
+              <Menu
+                mode="inline"
+                selectedKeys={[selectedKey]}
+                items={menuItems}
+                onClick={handleMenuClick}
+                className="sidebar-menu"
+              />
+            </Sider>
+            <Content className="app-content">
+              {renderContent()}
+            </Content>
+          </Layout>
         </Layout>
-      </Layout>
+      </AntdApp>
     </ConfigProvider>
   );
 };

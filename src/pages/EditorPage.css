@@ -1,0 +1,80 @@
+.editor-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f0f2f5;
+}
+
+.editor-header {
+  background: #fff;
+  border-bottom: 1px solid #e8e8e8;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  height: 64px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+}
+
+.editor-layout {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  padding: 16px;
+}
+
+.editor-pane {
+  flex: 1;
+  overflow: hidden;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.preview-pane {
+  flex: 1;
+  overflow: auto;
+  background: #f5f7fa;
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.preview-pane > div {
+  width: 100%;
+  max-width: 375px;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-pane .preview-wrapper {
+  background: #fff;
+  padding: 20px 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  flex: 1;
+}
+
+/* 预览区滚动条美化 */
+.preview-pane::-webkit-scrollbar {
+  width: 6px;
+}
+
+.preview-pane::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.preview-pane::-webkit-scrollbar-thumb {
+  background: #d0d0d0;
+  border-radius: 3px;
+}
+
+.preview-pane::-webkit-scrollbar-thumb:hover {
+  background: #b0b0b0;
+}

@@ -1,6 +1,7 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, Tag, Button, Space, message } from 'antd';
-import { EyeOutlined, LinkOutlined } from '@ant-design/icons';
+import { EyeOutlined, LinkOutlined, EditOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { ContentItem } from '../types';
 import { formatNumber, copyToClipboard } from '../utils';
@@ -23,6 +24,8 @@ const ContentTable: React.FC<ContentTableProps> = ({
   pageSize,
   onPageChange
 }) => {
+  const navigate = useNavigate();
+
   const handleCopyLink = async (url: string) => {
     const success = await copyToClipboard(url);
     if (success) {
@@ -34,6 +37,11 @@ const ContentTable: React.FC<ContentTableProps> = ({
 
   const handleView = (url: string) => {
     window.open(url, '_blank');
+  };
+
+  const handleStartCreate = (record: ContentItem) => {
+    // 跳转到编辑器页面,携带热点信息
+    navigate(`/editor?hotId=${record.gid}&title=${encodeURIComponent(record.title)}`);
   };
 
   const columns: ColumnsType<ContentItem> = [
@@ -149,9 +157,12 @@ const ContentTable: React.FC<ContentTableProps> = ({
     {
       title: '操作',
       key: 'action',
-      width: '10%',
+      width: '12%',
       render: (_: any, record: ContentItem) => (
         <Space size="small" wrap>
+          <Button type="primary" size="small" icon={<EditOutlined />} onClick={() => handleStartCreate(record)}>
+            开始创作
+          </Button>
           <Button type="link" size="small" icon={<EyeOutlined />} onClick={() => handleView(record.url)}>
             查看
           </Button>
