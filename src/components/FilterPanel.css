@@ -1,32 +1,37 @@
 .filter-panel {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .filter-card {
-  border-radius: 8px;
-  box-shadow: 0 2px 8px var(--card-shadow);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
   background: var(--bg-color);
   border: 1px solid var(--border-color);
 }
 
 .filter-card .ant-card-body {
-  padding: 12px 16px;
+  padding: 20px;
 }
 
 /* 筛选头部布局 */
 .filter-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 12px;
-  gap: 16px;
+  margin-bottom: 16px;
+  gap: 12px;
 }
 
 /* 展开/收起按钮 */
 .toggle-btn {
   white-space: nowrap;
   flex-shrink: 0;
+  border-radius: 6px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 /* 可折叠内容区域 */
@@ -37,7 +42,7 @@
 }
 
 .filter-content.expanded {
-  max-height: 500px;
+  max-height: 600px;
 }
 
 .filter-item {
@@ -47,41 +52,47 @@
 .filter-label {
   font-size: 13px;
   font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  transition: color 0.3s ease;
-}
-
-.filter-label::before {
-  content: '';
-  display: inline-block;
-  width: 3px;
-  height: 12px;
-  background: var(--primary-color);
-  border-radius: 2px;
-  margin-right: 6px;
-  transition: background 0.3s ease;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: block;
+  transition: color 0.2s ease;
+  min-width: 70px;
+  flex-shrink: 0;
 }
 
 /* Radio Button 样式优化 */
 .filter-panel .ant-radio-button-wrapper {
   border-color: var(--border-color);
   background: var(--bg-color);
-  color: var(--text-primary);
-  transition: all 0.2s ease;
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+  border-radius: 6px;
+  height: 32px;
+  line-height: 30px;
+  font-size: 13px;
+  padding: 0 14px;
+  font-weight: 500;
+}
+
+.filter-panel .ant-radio-button-wrapper:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.filter-panel .ant-radio-button-wrapper:last-child {
+  border-radius: 0 6px 6px 0;
 }
 
 .filter-panel .ant-radio-button-wrapper:hover {
-  color: var(--text-primary);
+  color: var(--primary-color);
   border-color: var(--primary-color);
+  background: rgba(34, 139, 230, 0.05);
 }
 
 .filter-panel .ant-radio-button-wrapper-checked {
   background: var(--primary-color);
   border-color: var(--primary-color);
   color: var(--bg-color);
+  box-shadow: none;
 }
 
 .filter-panel .ant-radio-button-wrapper-checked:hover {

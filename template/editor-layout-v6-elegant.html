@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI创作编辑器 V6 - 专业优雅版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #1677ff;
+            --bg-color: #f5f5f5;
+            --sidebar-bg: #ffffff;
+            --sidebar-dark: #2c2c2c;
+            --icon-bar-bg: #252526;
+            --border-color: #e0e0e0;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --hover-bg: #f3f4f6;
+            --active-bg: #e6f4ff;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.12);
+            --success-color: #52c41a;
+            --warning-color: #faad14;
+            --error-color: #ff4d4f;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--bg-color);
+            overflow: hidden;
+            color: var(--text-primary);
+        }
+
+        /* ============ 顶部工具栏 ============ */
+        .top-bar {
+            height: 56px;
+            background: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 50;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+        }
+
+        .top-bar-center {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 40px;
+        }
+
+        .title-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            font-weight: 600;
+            background: transparent;
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .title-input:hover,
+        .title-input:focus {
+            background: var(--hover-bg);
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--sidebar-bg);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background: #4096ff;
+            color: #fff;
+        }
+
+        /* ============ 主容器 ============ */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 56px);
+            position: relative;
+        }
+
+        /* ============ VSCode风格侧边栏 ============ */
+        .sidebar-container {
+            display: flex;
+            height: 100%;
+            z-index: 40;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* 图标栏 */
+        .icon-bar {
+            width: 60px;
+            background: var(--icon-bar-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 0;
+            gap: 8px;
+        }
+
+        .sidebar-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+            position: relative;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .sidebar-icon:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .sidebar-icon.active {
+            background: rgba(22, 119, 255, 0.2);
+            color: var(--primary-color);
+        }
+
+        .sidebar-icon.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            bottom: 8px;
+            width: 3px;
+            background: var(--primary-color);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .icon-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: -4px;
+            font-weight: 500;
+        }
+
+        /* 内容面板 */
+        .sidebar-panel {
+            width: 0;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: width 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-panel.active {
+            width: 320px;
+        }
+
+        .panel-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--sidebar-bg);
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-close {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .panel-close:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        /* ============ 历史记录面板 ============ */
+        .history-search {
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .history-search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+            font-size: 14px;
+        }
+
+        .history-search-input {
+            width: 100%;
+            padding: 8px 12px 8px 36px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.2s;
+            background: var(--bg-color);
+        }
+
+        .history-search-input:focus {
+            border-color: var(--primary-color);
+            background: var(--sidebar-bg);
+            box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.1);
+        }
+
+        .history-new-btn {
+            width: 100%;
+            padding: 10px;
+            background: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+            margin-bottom: 16px;
+        }
+
+        .history-new-btn:hover {
+            background: #4096ff;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .history-item {
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .history-item:hover {
+            background: var(--hover-bg);
+            border-color: var(--border-color);
+        }
+
+        .history-item.active {
+            background: var(--active-bg);
+            border-color: var(--primary-color);
+        }
+
+        .history-item-title {
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .history-item-meta {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ============ 流程面板 ============ */
+        .process-progress {
+            margin-bottom: 20px;
+            padding: 16px;
+            background: var(--hover-bg);
+            border-radius: 8px;
+        }
+
+        .progress-bar-container {
+            margin-top: 12px;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--gradient-primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .process-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .process-step-mini {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--sidebar-bg);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .process-step-mini:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .process-step-mini.completed {
+            border-color: var(--success-color);
+            background: #f6ffed;
+        }
+
+        .process-step-mini.active {
+            border-color: var(--primary-color);
+            background: var(--active-bg);
+            box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.1);
+        }
+
+        .step-icon-mini {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .step-info-mini {
+            flex: 1;
+        }
+
+        .step-title-mini {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .step-desc-mini {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .step-status-mini {
+            font-size: 20px;
+        }
+
+        .step-status-mini.completed {
+            color: var(--success-color);
+        }
+
+        .step-status-mini.active {
+            animation: spin 2s linear infinite;
+        }
+
+        .step-status-mini.pending {
+            color: var(--text-tertiary);
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 步骤详情弹窗 */
+        .step-detail-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .step-detail-overlay.active {
+            display: flex;
+        }
+
+        .step-detail-modal {
+            width: 600px;
+            max-height: 80vh;
+            background: var(--sidebar-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-detail-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .step-detail-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-detail-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .step-detail-content {
+            background: var(--bg-color);
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.8;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+            font-family: 'Cascadia Code', 'Consolas', monospace;
+        }
+
+        .process-start-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--gradient-primary);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+            margin-top: 16px;
+        }
+
+        .process-start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .process-start-btn:disabled {
+            background: #d9d9d9;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ============ 知识库面板占位 ============ */
+        .knowledge-placeholder {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-tertiary);
+        }
+
+        .placeholder-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .placeholder-text {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* ============ 编辑器区域 ============ */
+        .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--sidebar-bg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .editor-content {
+            flex: 1;
+            padding: 60px 80px;
+            overflow-y: auto;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .editor-textarea {
+            width: 100%;
+            min-height: calc(100vh - 300px);
+            border: none;
+            outline: none;
+            font-size: 16px;
+            line-height: 1.8;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Cascadia Code', monospace;
+            resize: none;
+            color: var(--text-primary);
+            background: transparent;
+        }
+
+        .editor-textarea::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .editor-empty-state {
+            text-align: center;
+            padding: 100px 40px;
+            color: var(--text-tertiary);
+        }
+
+        .editor-empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .editor-empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .editor-empty-desc {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-tertiary);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* ============ 预览面板 ============ */
+        .preview-panel {
+            width: 420px;
+            background: #f8f9fa;
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .preview-panel.collapsed {
+            transform: translateX(100%);
+        }
+
+        .preview-header {
+            padding: 16px 20px;
+            background: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .preview-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .preview-container {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .preview-phone {
+            width: 375px;
+            background: var(--sidebar-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            min-height: 600px;
+        }
+
+        .preview-content {
+            padding: 24px 20px;
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text-primary);
+        }
+
+        .preview-content h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            color: #1a1a1a;
+        }
+
+        .preview-content h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 24px 0 12px;
+            color: #2a2a2a;
+        }
+
+        .preview-content p {
+            margin-bottom: 16px;
+            color: #3a3a3a;
+        }
+
+        /* ============ 滚动条 ============ */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+
+        /* ============ 响应式 ============ */
+        @media (max-width: 1400px) {
+            .editor-content {
+                padding: 40px 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部工具栏 -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <div class="logo">
+                <span>✨</span>
+                <span>AI创作助手</span>
+            </div>
+        </div>
+        <div class="top-bar-center">
+            <input type="text" class="title-input" placeholder="无标题" value="中美将举行新一轮经贸磋商">
+        </div>
+        <div class="top-bar-right">
+            <select class="btn" style="border: none; padding: 8px 12px;">
+                <option>经典主题</option>
+                <option>优雅主题</option>
+                <option>简洁主题</option>
+            </select>
+            <button class="btn btn-primary">
+                <span>📋</span>
+                <span>复制</span>
+            </button>
+            <button class="btn">
+                <span>💾</span>
+                <span>保存</span>
+            </button>
+            <button class="btn" onclick="togglePreview()">
+                <span>📱</span>
+                <span>预览</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="main-container">
+        <!-- VSCode风格侧边栏 -->
+        <div class="sidebar-container">
+            <!-- 图标栏 -->
+            <div class="icon-bar">
+                <div class="sidebar-icon active" data-panel="history" onclick="togglePanel('history')" title="历史记录">
+                    <div style="text-align: center;">
+                        <div>📁</div>
+                        <div class="icon-label">历史</div>
+                    </div>
+                </div>
+                <div class="sidebar-icon" data-panel="process" onclick="togglePanel('process')" title="创作流程">
+                    <div style="text-align: center;">
+                        <div>📋</div>
+                        <div class="icon-label">流程</div>
+                    </div>
+                </div>
+                <div class="sidebar-icon" data-panel="knowledge" onclick="togglePanel('knowledge')" title="知识库">
+                    <div style="text-align: center;">
+                        <div>📚</div>
+                        <div class="icon-label">知识库</div>
+                    </div>
+                </div>
+                <div class="sidebar-icon" data-panel="titles" onclick="togglePanel('titles')" title="标题库">
+                    <div style="text-align: center;">
+                        <div>💡</div>
+                        <div class="icon-label">标题库</div>
+                    </div>
+                </div>
+                <div class="sidebar-icon" data-panel="styles" onclick="togglePanel('styles')" title="风格库">
+                    <div style="text-align: center;">
+                        <div>🎨</div>
+                        <div class="icon-label">风格库</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 历史记录面板 -->
+            <div class="sidebar-panel active" id="historyPanel">
+                <div class="panel-header">
+                    <div class="panel-title">📁 历史记录</div>
+                    <button class="panel-close" onclick="closePanel()">✕</button>
+                </div>
+                <div class="panel-content">
+                    <button class="history-new-btn">
+                        <span>➕</span>
+                        <span>新建创作</span>
+                    </button>
+                    <div class="history-search">
+                        <span class="history-search-icon">🔍</span>
+                        <input type="text" class="history-search-input" placeholder="搜索...">
+                    </div>
+                    <div class="history-list">
+                        <div class="history-item active">
+                            <div class="history-item-title">中美将举行新一轮经贸磋商</div>
+                            <div class="history-item-meta">
+                                <span>今天 14:30</span>
+                                <span>•</span>
+                                <span>2450字</span>
+                            </div>
+                        </div>
+                        <div class="history-item">
+                            <div class="history-item-title">2025央视主持人大赛黑马</div>
+                            <div class="history-item-meta">
+                                <span>昨天 10:15</span>
+                                <span>•</span>
+                                <span>890字</span>
+                            </div>
+                        </div>
+                        <div class="history-item">
+                            <div class="history-item-title">日本高规格迎接特朗普</div>
+                            <div class="history-item-meta">
+                                <span>3月25日</span>
+                                <span>•</span>
+                                <span>1024字</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 流程面板 -->
+            <div class="sidebar-panel" id="processPanel">
+                <div class="panel-header">
+                    <div class="panel-title">📋 创作流程</div>
+                    <button class="panel-close" onclick="closePanel()">✕</button>
+                </div>
+                <div class="panel-content">
+                    <div class="process-progress">
+                        <div style="font-size: 14px; font-weight: 600; color: var(--text-primary);">流程进度</div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="progressBar"></div>
+                        </div>
+                        <div class="progress-text" id="progressText">点击下方按钮开始创作</div>
+                    </div>
+
+                    <div class="process-steps">
+                        <div class="process-step-mini pending" data-step="0" onclick="showStepDetail(0)">
+                            <span class="step-icon-mini">🔍</span>
+                            <div class="step-info-mini">
+                                <div class="step-title-mini">热点素材搜索</div>
+                                <div class="step-desc-mini">Coze API深度调研</div>
+                            </div>
+                            <span class="step-status-mini pending">⏱️</span>
+                        </div>
+
+                        <div class="process-step-mini pending" data-step="1" onclick="showStepDetail(1)">
+                            <span class="step-icon-mini">🎯</span>
+                            <div class="step-info-mini">
+                                <div class="step-title-mini">选题分析</div>
+                                <div class="step-desc-mini">TopicAnalyzer</div>
+                            </div>
+                            <span class="step-status-mini pending">⏱️</span>
+                        </div>
+
+                        <div class="process-step-mini pending" data-step="2" onclick="showStepDetail(2)">
+                            <span class="step-icon-mini">📚</span>
+                            <div class="step-info-mini">
+                                <div class="step-title-mini">深度素材收集</div>
+                                <div class="step-desc-mini">MaterialHunter</div>
+                            </div>
+                            <span class="step-status-mini pending">⏱️</span>
+                        </div>
+
+                        <div class="process-step-mini pending" data-step="3" onclick="showStepDetail(3)">
+                            <span class="step-icon-mini">💡</span>
+                            <div class="step-info-mini">
+                                <div class="step-title-mini">观点策略设计</div>
+                                <div class="step-desc-mini">ViewpointStrategist</div>
+                            </div>
+                            <span class="step-status-mini pending">⏱️</span>
+                        </div>
+
+                        <div class="process-step-mini pending" data-step="4" onclick="showStepDetail(4)">
+                            <span class="step-icon-mini">🎴</span>
+                            <div class="step-info-mini">
+                                <div class="step-title-mini">观点卡片创作</div>
+                                <div class="step-desc-mini">CardCreator</div>
+                            </div>
+                            <span class="step-status-mini pending">⏱️</span>
+                        </div>
+
+                        <div class="process-step-mini pending" data-step="5" onclick="showStepDetail(5)">
+                            <span class="step-icon-mini">🎨</span>
+                            <div class="step-info-mini">
+                                <div class="step-title-mini">风格克隆</div>
+                                <div class="step-desc-mini">StyleCloner</div>
+                            </div>
+                            <span class="step-status-mini pending">⏱️</span>
+                        </div>
+
+                        <div class="process-step-mini pending" data-step="6" onclick="showStepDetail(6)">
+                            <span class="step-icon-mini">📝</span>
+                            <div class="step-info-mini">
+                                <div class="step-title-mini">文章组装</div>
+                                <div class="step-desc-mini">ArticleWeaver</div>
+                            </div>
+                            <span class="step-status-mini pending">⏱️</span>
+                        </div>
+                    </div>
+
+                    <button class="process-start-btn" id="startBtn" onclick="startCreation()">
+                        <span>✨</span>
+                        <span>开始AI创作</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 知识库面板 -->
+            <div class="sidebar-panel" id="knowledgePanel">
+                <div class="panel-header">
+                    <div class="panel-title">📚 知识库</div>
+                    <button class="panel-close" onclick="closePanel()">✕</button>
+                </div>
+                <div class="panel-content">
+                    <div class="knowledge-placeholder">
+                        <div class="placeholder-icon">📚</div>
+                        <div class="placeholder-text">
+                            知识库功能开发中<br>
+                            将包含历史文章、参考案例等<br>
+                            为AI创作提供背景知识
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 标题库面板 -->
+            <div class="sidebar-panel" id="titlesPanel">
+                <div class="panel-header">
+                    <div class="panel-title">💡 标题库 & 金句库</div>
+                    <button class="panel-close" onclick="closePanel()">✕</button>
+                </div>
+                <div class="panel-content">
+                    <div class="knowledge-placeholder">
+                        <div class="placeholder-icon">💡</div>
+                        <div class="placeholder-text">
+                            标题库与金句库开发中<br>
+                            将提供优质标题模板和金句<br>
+                            提升文章吸引力和感染力
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 风格库面板 -->
+            <div class="sidebar-panel" id="stylesPanel">
+                <div class="panel-header">
+                    <div class="panel-title">🎨 风格库</div>
+                    <button class="panel-close" onclick="closePanel()">✕</button>
+                </div>
+                <div class="panel-content">
+                    <div class="knowledge-placeholder">
+                        <div class="placeholder-icon">🎨</div>
+                        <div class="placeholder-text">
+                            风格库功能开发中<br>
+                            将包含多种写作风格模板<br>
+                            支持风格迁移和克隆
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 编辑器 -->
+        <div class="editor-area">
+            <div class="editor-content">
+                <div class="editor-empty-state" id="editorEmpty">
+                    <div class="editor-empty-icon">✍️</div>
+                    <div class="editor-empty-title">等待AI创作</div>
+                    <div class="editor-empty-desc">
+                        点击左侧"开始AI创作"按钮<br>
+                        AI将自动完成所有创作步骤<br>
+                        最终文章将展示在这里
+                    </div>
+                </div>
+                <textarea class="editor-textarea" id="editor" style="display: none;" placeholder="AI正在创作中..."></textarea>
+            </div>
+        </div>
+
+        <!-- 预览面板 -->
+        <div class="preview-panel" id="previewPanel">
+            <div class="preview-header">
+                <h3>📱 手机预览</h3>
+                <span style="font-size: 12px; color: var(--text-tertiary);">375px</span>
+            </div>
+            <div class="preview-container">
+                <div class="preview-phone">
+                    <div class="preview-content" id="preview">
+                        <p style="text-align: center; color: #999; padding: 100px 20px;">等待内容生成...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 步骤详情弹窗 -->
+    <div class="step-detail-overlay" id="stepDetailOverlay" onclick="closeStepDetail()">
+        <div class="step-detail-modal" onclick="event.stopPropagation()">
+            <div class="step-detail-header">
+                <div class="step-detail-title" id="stepDetailTitle">
+                    <span>🔍</span>
+                    <span>热点素材搜索</span>
+                </div>
+                <button class="panel-close" onclick="closeStepDetail()">✕</button>
+            </div>
+            <div class="step-detail-body">
+                <div class="step-detail-content" id="stepDetailContent">暂无内容</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟数据
+        const mockData = {
+            step0: {
+                title: "热点素材包",
+                icon: "🔍",
+                content: `核心事件: 中美双方宣布将于2025年1月举行新一轮经贸磋商
+
+事件类型: 历史逻辑与必然趋势
+
+热点数据:
+- 微博热搜: 排名第3位,阅读量2.8亿
+- 主流情绪: 理性观望(45%) > 谨慎乐观(35%)
+
+网友核心观点:
+- "谈判桌上的筹码来自实力"(60%)
+- "中国已不是40年前的中国"(75%)
+
+历史对比案例:
+- 朝鲜战争谈判: 战场决定谈判桌
+- 1993银河号: 屈辱检查
+- 2016南海对峙: 强势应对`
+            },
+            step1: {
+                title: "选题策略",
+                icon: "🎯",
+                content: `话题核心: 中美经贸磋商
+
+批判角度: 历史逻辑与必然趋势(主)
+
+论证套路: 历史数据对比式
+
+犀利度目标: 7.5-8.0分
+
+推荐历史文章:
+1. 《阿富汗战胜了美国》- 相似度92%
+2. 《朝鲜战争的启示》- 相似度88%`
+            },
+            step2: {
+                title: "素材汇总",
+                icon: "📚",
+                content: `深度数据收集完成:
+
+热点分析:
+- 触动社会痛点: 国家实力与谈判地位
+- 舆论风向: 支持65% vs 观望30%
+
+历史案例数据:
+- 朝鲜战争谈判: 推进367公里,歼敌82万
+- 1993银河号事件: 屈辱检查
+- 2016南海对峙: 美国航母撤离
+
+批判切入点:
+- 矛盾点: 实力悬殊的谈判结果
+- 共鸣点: 历史铁律的反复验证`
+            },
+            step3: {
+                title: "观点结构",
+                icon: "💡",
+                content: `核心观点: 实力决定谈判地位,这是历史铁律
+
+论证结构:
+1. 引入段: 中美磋商消息引发热议
+2. 分论点1: 朝鲜战争谈判案例
+3. 分论点2: 银河号vs南海对峙对比
+4. 分论点3(高潮): 今天中国的实力底气
+5. 结尾段: 升华主题
+
+预期犀利度: 7.8分`
+            },
+            step4: {
+                title: "观点卡片",
+                icon: "🎴",
+                content: `已创作卡片:
+- intro.md (引入段)
+- argument_1.md (朝鲜战争案例)
+- argument_2.md (20年对比)
+- argument_3.md (实力底气)
+- conclusion.md (结尾升华)
+
+总字数: 2450字`
+            },
+            step5: {
+                title: "风格检查报告",
+                icon: "🎨",
+                content: `风格相似度检查:
+- intro.md: 94%
+- argument_1.md: 92%
+- argument_2.md: 95%
+- argument_3.md: 93%
+- conclusion.md: 96%
+
+整体相似度: 94%
+风格一致性: ✅ 优秀`
+            },
+            step6: {
+                title: "最终文章",
+                icon: "📝",
+                content: `# 谈判桌上拿不到的东西,战场上也拿不到
+
+**摘要:** 实力决定谈判地位,这是历史铁律
+
+最近,中美双方宣布将举行新一轮经贸磋商。
+
+消息一出,网上又是一片热议。
+
+有人说这是好事,说明双方都有诚意。有人说要保持警惕,美国从来不会轻易让步。
+
+那到底该怎么看待这次磋商?
+
+1
+
+我们先看一个历史案例。
+
+1950年,朝鲜战争爆发。
+
+美军从仁川登陆,一路北进,打到鸭绿江边。麦克阿瑟狂言:"圣诞节前结束战争"。
+
+但中国人民志愿军入朝作战后,战场形势逆转。
+
+第一次战役,志愿军歼敌1.5万。第二次战役,歼敌3.6万,把美军赶回三八线以南。
+
+这时候,美国开始谈判了。
+
+1951年7月,停战谈判在开城开始。但美国依然在战场上不断试探,希望通过军事压力换取谈判筹码。
+
+中国怎么回应的?
+
+第五次战役,歼敌8.2万。上甘岭战役,43天激战,美军伤亡2.5万,中国伤亡1.5万。
+
+打得美国彻底认清现实:在战场上拿不到的东西,谈判桌上也别想拿到。
+
+1953年7月27日,《朝鲜停战协定》签署,战线稳定在三八线附近。
+
+这个案例说明了什么?
+
+**谈判的筹码,来自实力。**
+
+2
+
+再看一个对比。
+
+1993年,美国指控中国"银河号"货轮运输化学武器原料到伊朗。
+
+美国海军在公海上拦截"银河号",要求登船检查。
+
+中国当时实力有限,只能同意检查。最终美国一无所获,但这个耻辱深深刻在每个中国人心里。
+
+再看2016年,南海仲裁案。
+
+美国派航母来南海示威,想通过军事压力逼中国让步。
+
+但这次,中国的回应完全不同:
+
+"中国在南海的领土主权和海洋权益在任何情况下不受所谓仲裁裁决的影响。"
+
+美国航母来了,中国照样在南海岛礁上施工建设。
+
+最后,美国悄悄撤了,仲裁案成了一张废纸。
+
+20多年时间,中国的应对方式为什么截然不同?
+
+**因为实力变了。**
+
+3
+
+回到这次中美经贸磋商。
+
+有人担心,中国会不会让步太多?会不会重蹈当年的覆辙?
+
+我的回答是:不会。
+
+为什么?
+
+因为今天的中国,已经不是40年前的中国。
+
+2024年,中国GDP达到126万亿人民币,是美国的70%。制造业规模是美国的1.5倍,是美国、日本、德国总和。
+
+中国有全球最完整的工业体系,有14亿人口的超大市场,有每年900万大学生的人才储备。
+
+更重要的是,中国有战略定力。
+
+不是说中国不想谈,而是中国不怕谈崩。
+
+**因为我们有底气。**
+
+历史一次次证明:当你软弱时,对手只会得寸进尺;当你强大时,对手才会尊重你。
+
+朝鲜战争如此,南海对峙如此,这次经贸磋商也必然如此。
+
+中国会谈,但绝不会乞求。会妥协,但绝不会投降。
+
+因为我们早就明白一个道理:
+
+**谈判桌上拿不到的东西,战场上也拿不到;战场上拿不到的东西,谈判桌上更拿不到。**
+
+实力,才是唯一的通行证。
+
+---
+
+💡 文章创作完成,共2450字`
+            }
+        };
+
+        let currentPanel = 'history';
+        let previewVisible = true;
+        let currentStep = -1;
+
+        // 切换面板
+        function togglePanel(panelName) {
+            const icons = document.querySelectorAll('.sidebar-icon');
+            const panels = document.querySelectorAll('.sidebar-panel');
+
+            // 如果点击已激活的图标,关闭面板
+            if (currentPanel === panelName) {
+                closePanel();
+                return;
+            }
+
+            // 更新图标状态
+            icons.forEach(icon => {
+                if (icon.dataset.panel === panelName) {
+                    icon.classList.add('active');
+                } else {
+                    icon.classList.remove('active');
+                }
+            });
+
+            // 更新面板状态
+            panels.forEach(panel => {
+                panel.classList.remove('active');
+            });
+
+            document.getElementById(`${panelName}Panel`).classList.add('active');
+            currentPanel = panelName;
+        }
+
+        // 关闭面板
+        function closePanel() {
+            document.querySelectorAll('.sidebar-icon').forEach(icon => {
+                icon.classList.remove('active');
+            });
+            document.querySelectorAll('.sidebar-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            currentPanel = null;
+        }
+
+        // 切换预览
+        function togglePreview() {
+            previewVisible = !previewVisible;
+            const panel = document.getElementById('previewPanel');
+            if (previewVisible) {
+                panel.classList.remove('collapsed');
+            } else {
+                panel.classList.add('collapsed');
+            }
+        }
+
+        // 显示步骤详情
+        function showStepDetail(stepIndex) {
+            const data = mockData[`step${stepIndex}`];
+            if (!data || !data.content) return;
+
+            document.getElementById('stepDetailTitle').innerHTML = `
+                <span>${data.icon}</span>
+                <span>${data.title}</span>
+            `;
+            document.getElementById('stepDetailContent').textContent = data.content;
+            document.getElementById('stepDetailOverlay').classList.add('active');
+        }
+
+        // 关闭步骤详情
+        function closeStepDetail() {
+            document.getElementById('stepDetailOverlay').classList.remove('active');
+        }
+
+        // 更新步骤状态
+        function updateStepStatus(stepIndex, status) {
+            const step = document.querySelector(`.process-step-mini[data-step="${stepIndex}"]`);
+            const statusIcon = step.querySelector('.step-status-mini');
+
+            step.classList.remove('pending', 'active', 'completed');
+            statusIcon.classList.remove('pending', 'active', 'completed');
+
+            step.classList.add(status);
+            statusIcon.classList.add(status);
+
+            if (status === 'active') {
+                statusIcon.textContent = '⚙️';
+            } else if (status === 'completed') {
+                statusIcon.textContent = '✅';
+            } else {
+                statusIcon.textContent = '⏱️';
+            }
+
+            // 更新进度条
+            const progress = ((stepIndex + (status === 'completed' ? 1 : 0.5)) / 7) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+
+        // 更新编辑器
+        function updateEditor(content) {
+            const editor = document.getElementById('editor');
+            const emptyState = document.getElementById('editorEmpty');
+
+            emptyState.style.display = 'none';
+            editor.style.display = 'block';
+            editor.value = content;
+
+            updatePreview();
+        }
+
+        // 更新预览
+        function updatePreview() {
+            const editor = document.getElementById('editor');
+            const preview = document.getElementById('preview');
+            const content = editor.value;
+
+            let html = content
+                .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+                .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+                .replace(/^\*\*摘要:\*\* (.+)$/gm, '<p><strong>摘要:</strong> $1</p>')
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                .replace(/^(\d+)$/gm, '<h2 style="text-align: center; color: #999;">$1</h2>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/^(?!<h|<p)(.+)$/gm, '<p>$1</p>');
+
+            preview.innerHTML = html;
+        }
+
+        // 辅助函数
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // 开始创作
+        async function startCreation() {
+            const startBtn = document.getElementById('startBtn');
+            const progressText = document.getElementById('progressText');
+
+            startBtn.disabled = true;
+            startBtn.innerHTML = '<span>⏳</span><span>创作中...</span>';
+
+            // 步骤0: 热点素材搜索
+            progressText.textContent = '正在搜索热点素材...';
+            updateStepStatus(0, 'active');
+            await sleep(2500);
+            updateStepStatus(0, 'completed');
+
+            // 步骤1: 选题分析
+            progressText.textContent = '正在分析选题策略...';
+            updateStepStatus(1, 'active');
+            await sleep(2000);
+            updateStepStatus(1, 'completed');
+
+            // 步骤2: 深度素材收集
+            progressText.textContent = '正在收集深度素材...';
+            updateStepStatus(2, 'active');
+            await sleep(3000);
+            updateStepStatus(2, 'completed');
+
+            // 步骤3: 观点策略设计
+            progressText.textContent = '正在设计观点策略...';
+            updateStepStatus(3, 'active');
+            await sleep(2000);
+            updateStepStatus(3, 'completed');
+
+            // 步骤4: 观点卡片创作
+            progressText.textContent = '正在创作观点卡片...';
+            updateStepStatus(4, 'active');
+            await sleep(3500);
+            updateStepStatus(4, 'completed');
+
+            // 步骤5: 风格克隆
+            progressText.textContent = '正在进行风格克隆...';
+            updateStepStatus(5, 'active');
+            await sleep(1800);
+            updateStepStatus(5, 'completed');
+
+            // 步骤6: 文章组装
+            progressText.textContent = '正在组装最终文章...';
+            updateStepStatus(6, 'active');
+            await sleep(2200);
+            updateStepStatus(6, 'completed');
+
+            // 完成
+            progressText.textContent = '✅ 创作完成!';
+            updateEditor(mockData.step6.content);
+
+            startBtn.disabled = false;
+            startBtn.innerHTML = '<span>🔄</span><span>重新创作</span>';
+
+            alert('🎉 AI创作完成!\n\n最终文章已生成到编辑区,你可以继续修改编辑。');
+        }
+
+        // 编辑器实时预览
+        document.getElementById('editor').addEventListener('input', updatePreview);
+
+        console.log('✅ AI创作编辑器V6已加载 - VSCode优雅风格');
+        console.log('💡 核心特性:');
+        console.log('1. VSCode风格侧边栏 - 60px图标栏 + 320px内容面板');
+        console.log('2. 5个功能模块 - 历史/流程/知识库/标题库/风格库');
+        console.log('3. 更紧凑的流程展示 - 进度条 + 简化步骤列表');
+        console.log('4. 点击步骤查看详情 - 弹窗显示中间产物');
+        console.log('5. 完整的创作流程模拟 - 20秒演示全流程');
+    </script>
+</body>
+</html>

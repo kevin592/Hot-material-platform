@@ -1,24 +1,26 @@
 /* 表格整体样式 */
 .content-table {
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
 }
 
 .content-table .ant-table {
   background: var(--bg-color);
-  border-radius: 8px;
-  transition: background 0.3s ease;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  transition: background 0.2s ease;
 }
 
 /* 表头样式 */
 .content-table .ant-table-thead > tr > th {
-  background: var(--primary-color);
-  color: var(--bg-color);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
   font-weight: 600;
-  border-bottom: none;
-  padding: 12px;
+  border-bottom: 2px solid var(--border-color);
+  padding: 12px 16px;
   font-size: 13px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .content-table .ant-table-thead > tr > th::before {
@@ -27,60 +29,61 @@
 
 /* 表格行样式 */
 .content-table .ant-table-tbody > tr {
-  transition: all 0.3s ease;
+  transition: all 0.15s ease;
   background: var(--bg-color);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .content-table .ant-table-tbody > tr:hover {
   background: var(--hover-bg);
-  box-shadow: 0 2px 8px var(--card-shadow);
-  transform: translateY(-2px);
+}
+
+.content-table .ant-table-tbody > tr:last-child {
+  border-bottom: none;
 }
 
 .content-table .ant-table-tbody > tr > td {
-  padding: 12px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 14px 16px;
+  border-bottom: none;
   color: var(--text-primary);
-  transition: all 0.3s ease;
-}
-
-/* 斑马纹效果 */
-.content-table .ant-table-tbody > tr:nth-child(even) {
-  background: var(--secondary-bg);
-}
-
-.content-table .ant-table-tbody > tr:nth-child(even):hover {
-  background: var(--hover-bg);
+  transition: all 0.2s ease;
+  vertical-align: middle;
 }
 
 /* 标题单元格 */
 .title-cell {
-  max-width: 500px;
+  max-width: 400px;
+  line-height: 1.5;
 }
 
 .title-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 13px;
   font-weight: 500;
   color: var(--text-primary);
   margin-bottom: 6px;
-  line-height: 1.4;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: color 0.3s ease;
+  line-height: 1.5;
+  transition: color 0.2s ease;
+  cursor: pointer;
+}
+
+.title-text:hover {
+  color: var(--primary-color);
 }
 
 .author-info {
   font-size: 12px;
   color: var(--text-tertiary);
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 .fans-count {
   margin-left: 8px;
   color: var(--text-secondary);
   font-weight: 500;
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 .keywords-wrapper {
@@ -88,28 +91,30 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 6px;
 }
 
 .keywords-label {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-tertiary);
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 .keyword-tag {
   margin: 0;
-  font-size: 12px;
-  background: var(--tertiary-bg);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  transition: all 0.2s ease;
+  font-size: 11px;
+  background: var(--bg-secondary);
+  border: none;
+  color: var(--text-secondary);
+  padding: 2px 8px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
 }
 
 .keyword-separator {
   color: var(--text-tertiary);
   margin: 0 2px;
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 /* 数字单元格 */
@@ -117,30 +122,36 @@
   font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 /* 时间单元格 */
 .time-cell {
   font-size: 12px;
-  color: var(--text-secondary);
-  transition: color 0.3s ease;
+  color: var(--text-tertiary);
+  transition: color 0.2s ease;
 }
 
 /* 分页样式 */
 .content-table .ant-pagination {
-  margin: 16px 0 8px;
+  margin: 16px 0;
+  text-align: center;
 }
 
 .content-table .ant-pagination-item {
   background: var(--bg-color);
   border-color: var(--border-color);
-  transition: all 0.3s ease;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  min-width: 32px;
+  height: 32px;
+  line-height: 30px;
 }
 
 .content-table .ant-pagination-item a {
-  color: var(--text-primary);
-  transition: color 0.3s ease;
+  color: var(--text-secondary);
+  transition: color 0.15s ease;
+  font-size: 13px;
 }
 
 .content-table .ant-pagination-item-active {
@@ -154,36 +165,84 @@
 
 .content-table .ant-pagination-item:hover {
   border-color: var(--primary-color);
+  background: rgba(34, 139, 230, 0.05);
 }
 
 .content-table .ant-pagination-item:hover a {
   color: var(--primary-color);
 }
 
+.content-table .ant-pagination-item-active:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+.content-table .ant-pagination-item-active:hover a {
+  color: var(--bg-color);
+}
+
+.content-table .ant-pagination-prev,
+.content-table .ant-pagination-next {
+  min-width: 32px;
+  height: 32px;
+  line-height: 32px;
+  border-radius: 6px;
+}
+
 /* 操作按钮 */
+.content-table .ant-btn {
+  border-radius: 6px;
+  height: 32px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.content-table .ant-btn-primary {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.content-table .ant-btn-primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
 .content-table .ant-btn-link {
-  color: var(--text-primary);
+  color: var(--text-secondary);
   padding: 0 8px;
-  transition: color 0.3s ease;
+  transition: color 0.15s ease;
   white-space: nowrap;
 }
 
 .content-table .ant-btn-link:hover {
-  color: var(--text-secondary);
+  color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 /* 操作列Space容器 */
 .content-table .ant-space {
-  white-space: normal;
+  white-space: nowrap;
+  gap: 6px !important;
 }
 
 /* Tag 样式 */
 .platform-tag,
 .category-tag {
-  background: var(--tertiary-bg);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  transition: all 0.2s ease;
+  background: rgba(34, 139, 230, 0.1);
+  border: none;
+  color: var(--primary-color);
+  padding: 3px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.category-tag {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
 }
 
 /* 响应式表格 */

@@ -19,7 +19,7 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    strictPort: false,
+    strictPort: true,
     proxy: {
       '/api/upload': {
         target: 'http://localhost:3001',
@@ -29,10 +29,25 @@ export default defineConfig({
         target: 'http://localhost:3001',
         changeOrigin: true,
       },
-      '/api': {
-        target: 'https://www.czgts.cn/muse/content/api/v1',
+      '/api/titles': {
+        target: 'http://localhost:3001',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
+      },
+      '/api/elements': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+      '/api/generate': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+      '/api/health': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+      '/api/hots': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
       }
     }
   }

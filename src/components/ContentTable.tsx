@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Tag, Button, Space, message } from 'antd';
+import { Table, Tag, Button, Space, message, Tooltip } from 'antd';
 import { EyeOutlined, LinkOutlined, EditOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { ContentItem } from '../types';
@@ -49,10 +49,12 @@ const ContentTable: React.FC<ContentTableProps> = ({
       title: '标题',
       dataIndex: 'title',
       key: 'title',
-      width: '35%',
+      width: '30%',
       render: (text: string, record: ContentItem) => (
         <div className="title-cell">
-          <div className="title-text">{text}</div>
+          <Tooltip title={text} placement="topLeft">
+            <div className="title-text">{text}</div>
+          </Tooltip>
           {record.keywords && record.keywords.length > 0 && (
             <div className="keywords-wrapper">
               <span className="keywords-label">关键词:</span>
@@ -157,7 +159,7 @@ const ContentTable: React.FC<ContentTableProps> = ({
     {
       title: '操作',
       key: 'action',
-      width: '12%',
+      width: '17%',
       render: (_: any, record: ContentItem) => (
         <Space size="small" wrap>
           <Button type="primary" size="small" icon={<EditOutlined />} onClick={() => handleStartCreate(record)}>

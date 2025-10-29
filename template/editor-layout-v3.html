@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI创作编辑器 V3 - 优雅简洁版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #1677ff;
+            --bg-color: #fafbfc;
+            --sidebar-bg: #fff;
+            --border-color: #e8e8e8;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --hover-bg: #f3f4f6;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--bg-color);
+            overflow: hidden;
+            color: var(--text-primary);
+        }
+
+        /* ============ 顶部工具栏 ============ */
+        .top-bar {
+            height: 56px;
+            background: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 50;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .top-bar-center {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 40px;
+        }
+
+        .title-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            font-weight: 600;
+            background: transparent;
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .title-input:hover {
+            background: var(--hover-bg);
+        }
+
+        .title-input:focus {
+            background: var(--hover-bg);
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--sidebar-bg);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background: #4096ff;
+            color: #fff;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+        }
+
+        .icon-btn:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        /* ============ 主容器 ============ */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 56px);
+            position: relative;
+        }
+
+        /* ============ 左侧历史面板 ============ */
+        .history-sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .history-sidebar.collapsed {
+            transform: translateX(-100%);
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 40;
+        }
+
+        .history-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .new-btn {
+            width: 100%;
+            padding: 10px;
+            background: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .new-btn:hover {
+            background: #4096ff;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .search-box {
+            margin-top: 12px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px 8px 36px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.2s;
+            background: var(--bg-color);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary-color);
+            background: var(--sidebar-bg);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+            font-size: 14px;
+        }
+
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .history-item {
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .history-item:hover {
+            background: var(--hover-bg);
+        }
+
+        .history-item.active {
+            background: #e6f4ff;
+            border-color: var(--primary-color);
+        }
+
+        .history-title {
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .history-meta {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ============ 编辑器区域 ============ */
+        .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--sidebar-bg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .editor-content {
+            flex: 1;
+            padding: 60px 80px;
+            overflow-y: auto;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .editor-textarea {
+            width: 100%;
+            min-height: calc(100vh - 200px);
+            border: none;
+            outline: none;
+            font-size: 16px;
+            line-height: 1.8;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Cascadia Code', monospace;
+            resize: none;
+            color: var(--text-primary);
+            background: transparent;
+        }
+
+        .editor-textarea::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        /* ============ 右侧预览面板 ============ */
+        .preview-panel {
+            width: 420px;
+            background: #f8f9fa;
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .preview-panel.collapsed {
+            transform: translateX(100%);
+        }
+
+        .preview-header {
+            padding: 16px 20px;
+            background: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .preview-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .preview-container {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .preview-phone {
+            width: 375px;
+            background: var(--sidebar-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            min-height: 600px;
+        }
+
+        .preview-content {
+            padding: 24px 20px;
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text-primary);
+        }
+
+        .preview-content h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            color: #1a1a1a;
+        }
+
+        .preview-content h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 24px 0 12px;
+            color: #2a2a2a;
+        }
+
+        .preview-content p {
+            margin-bottom: 16px;
+            color: #3a3a3a;
+        }
+
+        /* ============ 右下角悬浮工具栏 ============ */
+        .floating-toolbar {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .float-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            background: var(--sidebar-bg);
+            box-shadow: var(--shadow-lg);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .float-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .float-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+
+        .float-btn-tooltip {
+            position: absolute;
+            right: 70px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        .float-btn:hover .float-btn-tooltip {
+            opacity: 1;
+        }
+
+        /* ============ 抽屉面板 ============ */
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .drawer-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -500px;
+            width: 480px;
+            height: 100vh;
+            background: var(--sidebar-bg);
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .drawer.active {
+            right: 0;
+        }
+
+        .drawer.left {
+            left: -500px;
+            right: auto;
+        }
+
+        .drawer.left.active {
+            left: 0;
+        }
+
+        .drawer-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .drawer-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .close-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .drawer-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .drawer-section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 500;
+        }
+
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+            background: var(--sidebar-bg);
+            color: var(--text-primary);
+            font-family: inherit;
+            margin-bottom: 16px;
+        }
+
+        .form-select:focus,
+        .form-textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.6;
+        }
+
+        .tag-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .tag {
+            padding: 10px 16px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--sidebar-bg);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .tag:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .tag.active {
+            background: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
+
+        .ai-btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .ai-btn {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .ai-btn.generate {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+
+        .ai-btn.generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .ai-btn.secondary {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+            border: 1.5px solid var(--border-color);
+        }
+
+        .ai-btn.secondary:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: #fff;
+        }
+
+        /* ============ 滚动条 ============ */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+
+        /* ============ 动画 ============ */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* ============ 响应式 ============ */
+        @media (max-width: 1400px) {
+            .editor-content {
+                padding: 40px 60px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .preview-panel {
+                width: 380px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部工具栏 -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <div class="logo">
+                <span>✨</span>
+                <span>AI创作助手</span>
+            </div>
+            <button class="icon-btn" onclick="toggleHistory()" title="历史记录">
+                <span>📁</span>
+            </button>
+        </div>
+        <div class="top-bar-center">
+            <input type="text" class="title-input" placeholder="无标题" value="2025央视主持人大赛最大黑马">
+        </div>
+        <div class="top-bar-right">
+            <select class="btn" style="border: none; padding: 8px 12px;">
+                <option>经典主题</option>
+                <option>优雅主题</option>
+                <option>简洁主题</option>
+            </select>
+            <button class="btn btn-primary">
+                <span>📋</span>
+                <span>复制</span>
+            </button>
+            <button class="btn">
+                <span>💾</span>
+                <span>保存</span>
+            </button>
+            <button class="icon-btn" onclick="togglePreview()" title="预览">
+                <span>📱</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="main-container">
+        <!-- 左侧历史 -->
+        <div class="history-sidebar" id="historySidebar">
+            <div class="history-header">
+                <button class="new-btn">
+                    <span>➕</span>
+                    <span>新建创作</span>
+                </button>
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" placeholder="搜索...">
+                </div>
+            </div>
+            <div class="history-list">
+                <div class="history-item active">
+                    <div class="history-title">2025央视主持人大赛黑马</div>
+                    <div class="history-meta">
+                        <span>今天 14:30</span>
+                        <span>•</span>
+                        <span>1256字</span>
+                    </div>
+                </div>
+                <div class="history-item">
+                    <div class="history-title">日本高规格迎接特朗普</div>
+                    <div class="history-meta">
+                        <span>昨天 10:15</span>
+                        <span>•</span>
+                        <span>890字</span>
+                    </div>
+                </div>
+                <div class="history-item">
+                    <div class="history-title">2号提车9号车祸的悲剧</div>
+                    <div class="history-meta">
+                        <span>3月25日</span>
+                        <span>•</span>
+                        <span>1024字</span>
+                    </div>
+                </div>
+                <div class="history-item">
+                    <div class="history-title">春节消费趋势分析报告</div>
+                    <div class="history-meta">
+                        <span>3月20日</span>
+                        <span>•</span>
+                        <span>2048字</span>
+                    </div>
+                </div>
+                <div class="history-item">
+                    <div class="history-title">人工智能发展现状与未来</div>
+                    <div class="history-meta">
+                        <span>3月15日</span>
+                        <span>•</span>
+                        <span>3200字</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 编辑器 -->
+        <div class="editor-area">
+            <div class="editor-content">
+                <textarea class="editor-textarea" id="editor" placeholder="开始你的创作，或点击右下角 AI 按钮获得帮助..."># 2025央视主持人大赛最大黑马竟是她，年仅22岁，康辉夸个不停！
+
+在2025年央视主持人大赛的舞台上，一位年仅22岁的新人主持横空出世，以出色的表现征服了评委和观众。
+
+## 初露锋芒
+
+这位年轻的主持人凭借扎实的基本功和独特的个人魅力，在众多参赛选手中脱颖而出。康辉老师在点评时连连称赞："这位小姑娘的台风稳健，语言表达能力强，未来可期！"
+
+## 成长之路
+
+据了解，她从小就对主持事业充满热情，通过不懈的努力和专业的训练，终于在这个舞台上绽放光芒。她的成功不仅仅是天赋使然，更是汗水和坚持的结晶。
+
+## 未来展望
+
+随着比赛的深入，这位22岁的新秀将会面临更多的挑战和机遇。我们期待她能够继续保持这样的状态，为观众带来更多精彩的表现。</textarea>
+            </div>
+        </div>
+
+        <!-- 预览面板 -->
+        <div class="preview-panel" id="previewPanel">
+            <div class="preview-header">
+                <h3>📱 手机预览</h3>
+                <span style="font-size: 12px; color: var(--text-tertiary);">375px</span>
+            </div>
+            <div class="preview-container">
+                <div class="preview-phone">
+                    <div class="preview-content" id="preview">
+                        <h1>2025央视主持人大赛最大黑马竟是她，年仅22岁，康辉夸个不停！</h1>
+                        <p>在2025年央视主持人大赛的舞台上，一位年仅22岁的新人主持横空出世，以出色的表现征服了评委和观众。</p>
+                        <h2>初露锋芒</h2>
+                        <p>这位年轻的主持人凭借扎实的基本功和独特的个人魅力，在众多参赛选手中脱颖而出。康辉老师在点评时连连称赞："这位小姑娘的台风稳健，语言表达能力强，未来可期！"</p>
+                        <h2>成长之路</h2>
+                        <p>据了解，她从小就对主持事业充满热情，通过不懈的努力和专业的训练，终于在这个舞台上绽放光芒。她的成功不仅仅是天赋使然，更是汗水和坚持的结晶。</p>
+                        <h2>未来展望</h2>
+                        <p>随着比赛的深入，这位22岁的新秀将会面临更多的挑战和机遇。我们期待她能够继续保持这样的状态，为观众带来更多精彩的表现。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右下角悬浮工具栏 -->
+    <div class="floating-toolbar">
+        <button class="float-btn" onclick="openMaterialDrawer()">
+            <span>📌</span>
+            <span class="float-btn-tooltip">热点素材</span>
+        </button>
+        <button class="float-btn primary" onclick="openSettingsDrawer()">
+            <span>✨</span>
+            <span class="float-btn-tooltip">AI设置</span>
+        </button>
+        <button class="float-btn" onclick="scrollToTop()">
+            <span>⬆️</span>
+            <span class="float-btn-tooltip">回到顶部</span>
+        </button>
+    </div>
+
+    <!-- 遮罩层 -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="closeAllDrawers()"></div>
+
+    <!-- AI设置抽屉 -->
+    <div class="drawer" id="settingsDrawer">
+        <div class="drawer-header">
+            <h2>AI 创作设置</h2>
+            <button class="close-btn" onclick="closeAllDrawers()">✕</button>
+        </div>
+        <div class="drawer-content">
+            <!-- 写作风格 -->
+            <div class="drawer-section">
+                <div class="section-title">🎨 写作风格</div>
+                <div class="tag-grid">
+                    <div class="tag active">专业严谨</div>
+                    <div class="tag">轻松幽默</div>
+                    <div class="tag">感性细腻</div>
+                    <div class="tag">理性客观</div>
+                    <div class="tag">热情激昂</div>
+                    <div class="tag">温和平实</div>
+                </div>
+            </div>
+
+            <!-- 文章类型 -->
+            <div class="drawer-section">
+                <div class="section-title">📝 文章类型</div>
+                <label class="form-label">选择内容类型</label>
+                <select class="form-select">
+                    <option>新闻资讯</option>
+                    <option>深度评论</option>
+                    <option>情感故事</option>
+                    <option>知识科普</option>
+                    <option>热点解读</option>
+                </select>
+            </div>
+
+            <!-- 目标读者 -->
+            <div class="drawer-section">
+                <div class="section-title">👥 目标读者</div>
+                <div class="tag-grid">
+                    <div class="tag active">大众读者</div>
+                    <div class="tag">年轻群体</div>
+                    <div class="tag">专业人士</div>
+                    <div class="tag">行业从业者</div>
+                </div>
+            </div>
+
+            <!-- 创作要求 -->
+            <div class="drawer-section">
+                <div class="section-title">💡 创作要求</div>
+                <label class="form-label">告诉 AI 你的特殊需求</label>
+                <textarea class="form-textarea" placeholder="例如：
+• 重点突出主人公的成长经历
+• 多使用数据支撑观点
+• 结尾要有启发性
+• 控制在1500字以内"></textarea>
+            </div>
+
+            <!-- AI功能按钮 -->
+            <div class="drawer-section">
+                <div class="section-title">🤖 AI 辅助</div>
+                <div class="ai-btn-group">
+                    <button class="ai-btn generate">
+                        <span>✨</span>
+                        <span>AI 生成内容</span>
+                    </button>
+                    <button class="ai-btn secondary">
+                        <span>🔄</span>
+                        <span>AI 优化润色</span>
+                    </button>
+                    <button class="ai-btn secondary">
+                        <span>➕</span>
+                        <span>AI 续写扩展</span>
+                    </button>
+                    <button class="ai-btn secondary">
+                        <span>✂️</span>
+                        <span>AI 精简压缩</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 素材抽屉 -->
+    <div class="drawer left" id="materialDrawer">
+        <div class="drawer-header">
+            <h2>热点素材库</h2>
+            <button class="close-btn" onclick="closeAllDrawers()">✕</button>
+        </div>
+        <div class="drawer-content">
+            <div class="drawer-section">
+                <div class="section-title">📌 选择素材</div>
+                <label class="form-label">当前选中</label>
+                <select class="form-select">
+                    <option>2025央视主持人大赛最大黑马竟是她...</option>
+                    <option>日本高规格迎接特朗普，这上特大见面礼...</option>
+                    <option>2号提车，9号车祸，15号赔路...</option>
+                </select>
+
+                <label class="form-label">素材内容</label>
+                <textarea class="form-textarea" style="min-height: 300px;" readonly>2025央视主持人大赛最大黑马竟是她，年仅22岁，康辉夸个不停！
+
+在2025年央视主持人大赛中，一位年仅22岁的新人主持人成为最大黑马，她凭借出色的表现征服了评委和观众。
+
+康辉老师在点评时表示："这位小姑娘的台风稳健，语言表达能力强，未来可期！"
+
+这位新秀主持人展现出了超越年龄的成熟和专业素养...</textarea>
+
+                <button class="ai-btn generate" style="margin-top: 16px;">
+                    <span>📝</span>
+                    <span>使用此素材创作</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局状态
+        let historyVisible = true;
+        let previewVisible = true;
+
+        // 切换历史侧边栏
+        function toggleHistory() {
+            historyVisible = !historyVisible;
+            const sidebar = document.getElementById('historySidebar');
+            if (historyVisible) {
+                sidebar.classList.remove('collapsed');
+            } else {
+                sidebar.classList.add('collapsed');
+            }
+        }
+
+        // 切换预览面板
+        function togglePreview() {
+            previewVisible = !previewVisible;
+            const panel = document.getElementById('previewPanel');
+            if (previewVisible) {
+                panel.classList.remove('collapsed');
+            } else {
+                panel.classList.add('collapsed');
+            }
+        }
+
+        // 打开设置抽屉
+        function openSettingsDrawer() {
+            document.getElementById('settingsDrawer').classList.add('active');
+            document.getElementById('drawerOverlay').classList.add('active');
+        }
+
+        // 打开素材抽屉
+        function openMaterialDrawer() {
+            document.getElementById('materialDrawer').classList.add('active');
+            document.getElementById('drawerOverlay').classList.add('active');
+        }
+
+        // 关闭所有抽屉
+        function closeAllDrawers() {
+            document.getElementById('settingsDrawer').classList.remove('active');
+            document.getElementById('materialDrawer').classList.remove('active');
+            document.getElementById('drawerOverlay').classList.remove('active');
+        }
+
+        // 回到顶部
+        function scrollToTop() {
+            document.querySelector('.editor-content').scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // 实时预览更新
+        const editor = document.getElementById('editor');
+        const preview = document.getElementById('preview');
+
+        function updatePreview() {
+            const content = editor.value;
+
+            // 简单的Markdown渲染
+            let html = content
+                .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+                .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+                .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/^(?!<h|<p)(.+)$/gm, '<p>$1</p>');
+
+            preview.innerHTML = html;
+        }
+
+        editor.addEventListener('input', updatePreview);
+
+        // 标签选择
+        document.querySelectorAll('.tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                const group = this.parentElement;
+                group.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 历史记录切换
+        document.querySelectorAll('.history-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.history-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 初始化
+        updatePreview();
+    </script>
+</body>
+</html>

@@ -17,6 +17,7 @@ import {
 import type { MenuProps } from 'antd';
 import ContentListPage from './pages/ContentListPage';
 import EditorPage from './pages/EditorPage';
+import TitleLibraryPage from './pages/TitleLibraryPage';
 import './App.css';
 
 const { Header, Sider, Content } = Layout;
@@ -84,8 +85,23 @@ const themeConfig = {
 
 const App: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
-  const [selectedKey, setSelectedKey] = useState('discover');
+
+  // 从 URL 读取当前页面
+  const getKeyFromPath = (pathname: string) => {
+    const path = pathname.replace(/^\//, '');
+    if (!path || path === 'discover') return 'discover';
+    return path;
+  };
+
+  const [selectedKey, setSelectedKey] = useState(() => getKeyFromPath(location.pathname));
+
+  // 监听 URL 变化
+  React.useEffect(() => {
+    const key = getKeyFromPath(location.pathname);
+    setSelectedKey(key);
+  }, [location.pathname]);
 
   // 检测是否在编辑器路由
   const isEditorPage = location.pathname === '/editor';
@@ -169,9 +185,9 @@ const App: React.FC = () => {
       label: '金句库',
     },
     {
-      key: 'title-formulas',
+      key: 'title-library',
       icon: <TagOutlined />,
-      label: '标题公式',
+      label: '标题知识库',
     },
     {
       key: 'content-templates',
@@ -182,6 +198,8 @@ const App: React.FC = () => {
 
   const handleMenuClick = (e: { key: string }) => {
     setSelectedKey(e.key);
+    // 更新 URL
+    navigate(`/${e.key}`);
   };
 
   const renderContent = () => {
@@ -204,8 +222,8 @@ const App: React.FC = () => {
         return <PlaceholderPage title="作者库" />;
       case 'golden-sentences':
         return <PlaceholderPage title="金句库" />;
-      case 'title-formulas':
-        return <PlaceholderPage title="标题公式" />;
+      case 'title-library':
+        return <TitleLibraryPage />;
       case 'content-templates':
         return <PlaceholderPage title="内容模板" />;
       default:
@@ -234,7 +252,7 @@ const App: React.FC = () => {
               collapsed={collapsed}
               onCollapse={setCollapsed}
               className="app-sider"
-              width={220}
+              width={200}
             >
               <Menu
                 mode="inline"

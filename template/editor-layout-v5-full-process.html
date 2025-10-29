@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI创作编辑器 V5 - 完整创作流程可视化</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #1677ff;
+            --bg-color: #fafbfc;
+            --sidebar-bg: #fff;
+            --border-color: #e8e8e8;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-tertiary: #9ca3af;
+            --hover-bg: #f3f4f6;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --success-color: #52c41a;
+            --warning-color: #faad14;
+            --process-color: #1677ff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--bg-color);
+            overflow: hidden;
+            color: var(--text-primary);
+        }
+
+        /* ============ 顶部工具栏 ============ */
+        .top-bar {
+            height: 56px;
+            background: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 50;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ============ 左侧历史面板 ============ */
+        .history-sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .history-sidebar.collapsed {
+            transform: translateX(-100%);
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 40;
+        }
+
+        .history-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .new-btn {
+            width: 100%;
+            padding: 10px;
+            background: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .new-btn:hover {
+            background: #4096ff;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .search-box {
+            margin-top: 12px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px 8px 36px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.2s;
+            background: var(--bg-color);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary-color);
+            background: var(--sidebar-bg);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+            font-size: 14px;
+        }
+
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .history-item {
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .history-item:hover {
+            background: var(--hover-bg);
+        }
+
+        .history-item.active {
+            background: #e6f4ff;
+            border-color: var(--primary-color);
+        }
+
+        .history-title {
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .history-meta {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .top-bar-center {
+            flex: 1;
+            max-width: 600px;
+            margin: 0 40px;
+        }
+
+        .title-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            font-weight: 600;
+            background: transparent;
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .title-input:hover {
+            background: var(--hover-bg);
+        }
+
+        .title-input:focus {
+            background: var(--hover-bg);
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--sidebar-bg);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background: #4096ff;
+            color: #fff;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+        }
+
+        .icon-btn:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        /* ============ 主容器 ============ */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 56px);
+            position: relative;
+        }
+
+        /* ============ 左侧流程面板 ============ */
+        .process-sidebar {
+            width: 320px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+
+        .process-sidebar.collapsed {
+            transform: translateX(-100%);
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 40;
+        }
+
+        .process-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .process-header h3 {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .process-status {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .process-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #52c41a;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .process-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .process-step {
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            background: var(--sidebar-bg);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .process-step:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .process-step.completed {
+            border-color: var(--success-color);
+            background: #f6ffed;
+        }
+
+        .process-step.active {
+            border-color: var(--process-color);
+            background: #e6f4ff;
+            box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.1);
+        }
+
+        .process-step.pending {
+            opacity: 0.6;
+        }
+
+        .process-step-header {
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .process-step-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .process-step-content {
+            flex: 1;
+        }
+
+        .process-step-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .process-step-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .process-step-status {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .process-step-status.completed {
+            background: #f6ffed;
+            color: var(--success-color);
+        }
+
+        .process-step-status.active {
+            background: #e6f4ff;
+            color: var(--process-color);
+        }
+
+        .process-step-status.pending {
+            background: #f5f5f5;
+            color: var(--text-tertiary);
+        }
+
+        .process-step-body {
+            padding: 0 14px 12px 14px;
+            display: none;
+            border-top: 1px solid var(--border-color);
+            margin-top: 8px;
+            padding-top: 12px;
+        }
+
+        .process-step.expanded .process-step-body {
+            display: block;
+        }
+
+        .process-step-preview {
+            background: #fafafa;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .process-action-bar {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+            background: #fafafa;
+        }
+
+        .process-start-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .process-start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .process-start-btn:disabled {
+            background: #d9d9d9;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ============ 编辑器区域 ============ */
+        .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--sidebar-bg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .editor-toolbar {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: #fafafa;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .editor-toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .editor-toolbar-title {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .editor-toolbar-status {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: #e6f4ff;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .editor-content {
+            flex: 1;
+            padding: 60px 80px;
+            overflow-y: auto;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .editor-textarea {
+            width: 100%;
+            min-height: calc(100vh - 300px);
+            border: none;
+            outline: none;
+            font-size: 16px;
+            line-height: 1.8;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Cascadia Code', monospace;
+            resize: none;
+            color: var(--text-primary);
+            background: transparent;
+        }
+
+        .editor-textarea::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        /* 编辑器空状态 */
+        .editor-empty-state {
+            text-align: center;
+            padding: 100px 40px;
+            color: var(--text-tertiary);
+        }
+
+        .editor-empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .editor-empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .editor-empty-desc {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-tertiary);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* ============ 右侧预览面板 ============ */
+        .preview-panel {
+            width: 420px;
+            background: #f8f9fa;
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .preview-panel.collapsed {
+            transform: translateX(100%);
+        }
+
+        .preview-header {
+            padding: 16px 20px;
+            background: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .preview-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .preview-container {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .preview-phone {
+            width: 375px;
+            background: var(--sidebar-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            min-height: 600px;
+        }
+
+        .preview-content {
+            padding: 24px 20px;
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text-primary);
+        }
+
+        .preview-content h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.4;
+            color: #1a1a1a;
+        }
+
+        .preview-content h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 24px 0 12px;
+            color: #2a2a2a;
+        }
+
+        .preview-content p {
+            margin-bottom: 16px;
+            color: #3a3a3a;
+        }
+
+        .preview-content strong {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        /* ============ 加载遮罩 ============ */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #f0f0f0;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 16px;
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .loading-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* ============ 滚动条 ============ */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部工具栏 -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <div class="logo">
+                <span>✨</span>
+                <span>AI创作助手</span>
+            </div>
+            <button class="icon-btn" onclick="toggleHistory()" title="历史记录">
+                <span>📁</span>
+            </button>
+            <button class="icon-btn" onclick="toggleProcess()" title="创作流程">
+                <span>📋</span>
+            </button>
+        </div>
+        <div class="top-bar-center">
+            <input type="text" class="title-input" placeholder="无标题" value="中美将举行新一轮经贸磋商">
+        </div>
+        <div class="top-bar-right">
+            <select class="btn" style="border: none; padding: 8px 12px;">
+                <option>经典主题</option>
+                <option>优雅主题</option>
+                <option>简洁主题</option>
+            </select>
+            <button class="btn btn-primary">
+                <span>📋</span>
+                <span>复制</span>
+            </button>
+            <button class="btn">
+                <span>💾</span>
+                <span>保存</span>
+            </button>
+            <button class="icon-btn" onclick="togglePreview()" title="预览">
+                <span>📱</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="main-container">
+        <!-- 左侧历史面板 -->
+        <div class="history-sidebar" id="historySidebar">
+            <div class="history-header">
+                <button class="new-btn">
+                    <span>➕</span>
+                    <span>新建创作</span>
+                </button>
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" placeholder="搜索...">
+                </div>
+            </div>
+            <div class="history-list">
+                <div class="history-item active">
+                    <div class="history-title">中美将举行新一轮经贸磋商</div>
+                    <div class="history-meta">
+                        <span>今天 14:30</span>
+                        <span>•</span>
+                        <span>2450字</span>
+                    </div>
+                </div>
+                <div class="history-item">
+                    <div class="history-title">2025央视主持人大赛黑马</div>
+                    <div class="history-meta">
+                        <span>昨天 10:15</span>
+                        <span>•</span>
+                        <span>890字</span>
+                    </div>
+                </div>
+                <div class="history-item">
+                    <div class="history-title">日本高规格迎接特朗普</div>
+                    <div class="history-meta">
+                        <span>3月25日</span>
+                        <span>•</span>
+                        <span>1024字</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 中间流程面板 -->
+        <div class="process-sidebar" id="processSidebar">
+            <div class="process-header">
+                <h3>🤖 AI创作流程</h3>
+                <div class="process-status">
+                    <span class="process-status-dot"></span>
+                    <span id="processStatusText">点击下方按钮开始创作</span>
+                </div>
+            </div>
+
+            <div class="process-list">
+                <!-- 步骤0: 素材搜索 -->
+                <div class="process-step pending" id="step0" onclick="toggleStep(0)">
+                    <div class="process-step-header">
+                        <span class="process-step-icon">🔍</span>
+                        <div class="process-step-content">
+                            <div class="process-step-title">热点素材搜索</div>
+                            <div class="process-step-desc">Coze API深度调研</div>
+                        </div>
+                        <span class="process-step-status pending">等待中</span>
+                    </div>
+                    <div class="process-step-body">
+                        <div class="process-step-preview">暂无内容</div>
+                    </div>
+                </div>
+
+                <!-- 步骤1: 选题分析 -->
+                <div class="process-step pending" id="step1" onclick="toggleStep(1)">
+                    <div class="process-step-header">
+                        <span class="process-step-icon">🎯</span>
+                        <div class="process-step-content">
+                            <div class="process-step-title">选题分析</div>
+                            <div class="process-step-desc">TopicAnalyzer</div>
+                        </div>
+                        <span class="process-step-status pending">等待中</span>
+                    </div>
+                    <div class="process-step-body">
+                        <div class="process-step-preview">暂无内容</div>
+                    </div>
+                </div>
+
+                <!-- 步骤2: 素材收集 -->
+                <div class="process-step pending" id="step2" onclick="toggleStep(2)">
+                    <div class="process-step-header">
+                        <span class="process-step-icon">📚</span>
+                        <div class="process-step-content">
+                            <div class="process-step-title">深度素材收集</div>
+                            <div class="process-step-desc">MaterialHunter</div>
+                        </div>
+                        <span class="process-step-status pending">等待中</span>
+                    </div>
+                    <div class="process-step-body">
+                        <div class="process-step-preview">暂无内容</div>
+                    </div>
+                </div>
+
+                <!-- 步骤3: 观点策略 -->
+                <div class="process-step pending" id="step3" onclick="toggleStep(3)">
+                    <div class="process-step-header">
+                        <span class="process-step-icon">💡</span>
+                        <div class="process-step-content">
+                            <div class="process-step-title">观点策略设计</div>
+                            <div class="process-step-desc">ViewpointStrategist</div>
+                        </div>
+                        <span class="process-step-status pending">等待中</span>
+                    </div>
+                    <div class="process-step-body">
+                        <div class="process-step-preview">暂无内容</div>
+                    </div>
+                </div>
+
+                <!-- 步骤4: 卡片创作 -->
+                <div class="process-step pending" id="step4" onclick="toggleStep(4)">
+                    <div class="process-step-header">
+                        <span class="process-step-icon">🎴</span>
+                        <div class="process-step-content">
+                            <div class="process-step-title">观点卡片创作</div>
+                            <div class="process-step-desc">CardCreator</div>
+                        </div>
+                        <span class="process-step-status pending">等待中</span>
+                    </div>
+                    <div class="process-step-body">
+                        <div class="process-step-preview">暂无内容</div>
+                    </div>
+                </div>
+
+                <!-- 步骤5: 风格克隆 -->
+                <div class="process-step pending" id="step5" onclick="toggleStep(5)">
+                    <div class="process-step-header">
+                        <span class="process-step-icon">🎨</span>
+                        <div class="process-step-content">
+                            <div class="process-step-title">风格克隆</div>
+                            <div class="process-step-desc">StyleCloner</div>
+                        </div>
+                        <span class="process-step-status pending">等待中</span>
+                    </div>
+                    <div class="process-step-body">
+                        <div class="process-step-preview">暂无内容</div>
+                    </div>
+                </div>
+
+                <!-- 步骤6: 文章组装 -->
+                <div class="process-step pending" id="step6" onclick="toggleStep(6)">
+                    <div class="process-step-header">
+                        <span class="process-step-icon">📝</span>
+                        <div class="process-step-content">
+                            <div class="process-step-title">文章组装</div>
+                            <div class="process-step-desc">ArticleWeaver</div>
+                        </div>
+                        <span class="process-step-status pending">等待中</span>
+                    </div>
+                    <div class="process-step-body">
+                        <div class="process-step-preview">暂无内容</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="process-action-bar">
+                <button class="process-start-btn" id="startBtn" onclick="startCreation()">
+                    <span>✨</span>
+                    <span>开始AI创作</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 编辑器 -->
+        <div class="editor-area">
+            <div class="editor-toolbar">
+                <div class="editor-toolbar-left">
+                    <span class="editor-toolbar-title">最终文章</span>
+                    <span class="editor-toolbar-status" id="editorStatus">等待创作</span>
+                </div>
+            </div>
+
+            <div class="editor-content">
+                <!-- 空状态 -->
+                <div class="editor-empty-state" id="editorEmpty">
+                    <div class="editor-empty-icon">✍️</div>
+                    <div class="editor-empty-title">等待AI创作</div>
+                    <div class="editor-empty-desc">
+                        点击左侧"开始AI创作"按钮<br>
+                        AI将自动完成所有创作步骤<br>
+                        最终文章将展示在这里
+                    </div>
+                </div>
+
+                <!-- 编辑器 -->
+                <textarea class="editor-textarea" id="editor" style="display: none;" placeholder="AI正在创作中..."></textarea>
+            </div>
+
+            <!-- 加载遮罩 -->
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="loading-content">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text" id="loadingText">正在初始化...</div>
+                    <div class="loading-desc" id="loadingDesc">请稍候</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 预览面板 -->
+        <div class="preview-panel" id="previewPanel">
+            <div class="preview-header">
+                <h3>📱 手机预览</h3>
+                <span style="font-size: 12px; color: var(--text-tertiary);">375px</span>
+            </div>
+            <div class="preview-container">
+                <div class="preview-phone">
+                    <div class="preview-content" id="preview">
+                        <p style="text-align: center; color: #999; padding: 100px 20px;">等待内容生成...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局状态
+        let historyVisible = true;
+        let processVisible = true;
+        let previewVisible = true;
+        let currentStep = -1;
+        let isCreating = false;
+
+        // 切换历史面板
+        function toggleHistory() {
+            historyVisible = !historyVisible;
+            const sidebar = document.getElementById('historySidebar');
+            if (historyVisible) {
+                sidebar.classList.remove('collapsed');
+            } else {
+                sidebar.classList.add('collapsed');
+            }
+        }
+
+        // 切换流程面板
+        function toggleProcess() {
+            processVisible = !processVisible;
+            const sidebar = document.getElementById('processSidebar');
+            if (processVisible) {
+                sidebar.classList.remove('collapsed');
+            } else {
+                sidebar.classList.add('collapsed');
+            }
+        }
+
+        // 模拟数据
+        const mockData = {
+            step0: {
+                title: "热点素材包",
+                content: `核心事件: 中美双方宣布将于2025年1月举行新一轮经贸磋商
+
+事件类型: 历史逻辑与必然趋势
+
+热点数据:
+- 微博热搜: 排名第3位，阅读量2.8亿
+- 主流情绪: 理性观望(45%) > 谨慎乐观(35%)
+
+网友核心观点:
+- "谈判桌上的筹码来自实力"(60%)
+- "中国已不是40年前的中国"(75%)
+
+历史对比案例:
+- 朝鲜战争谈判: 战场决定谈判桌...`
+            },
+            step1: {
+                title: "选题策略",
+                content: `话题核心: 中美经贸磋商
+
+批判角度: 历史逻辑与必然趋势(主)
+
+论证套路: 历史数据对比式
+
+犀利度目标: 7.5-8.0分
+
+推荐历史文章:
+1. 《阿富汗战胜了美国》- 相似度92%
+2. 《朝鲜战争的启示》- 相似度88%`
+            },
+            step2: {
+                title: "素材汇总",
+                content: `深度数据收集完成:
+
+热点分析:
+- 触动社会痛点: 国家实力与谈判地位
+- 舆论风向: 支持65% vs 观望30%
+
+历史案例数据:
+- 朝鲜战争谈判: 推进367公里，歼敌82万
+- 1993银河号事件: 屈辱检查
+- 2016南海对峙: 美国航母撤离
+
+批判切入点:
+- 矛盾点: 实力悬殊的谈判结果
+- 共鸣点: 历史铁律的反复验证`
+            },
+            step3: {
+                title: "观点结构",
+                content: `核心观点: 实力决定谈判地位，这是历史铁律
+
+论证结构:
+1. 引入段: 中美磋商消息引发热议
+2. 分论点1: 朝鲜战争谈判案例
+3. 分论点2: 银河号vs南海对峙对比
+4. 分论点3(高潮): 今天中国的实力底气
+5. 结尾段: 升华主题
+
+预期犀利度: 7.8分`
+            },
+            step4: {
+                title: "观点卡片",
+                content: `已创作卡片:
+- intro.md (引入段)
+- argument_1.md (朝鲜战争案例)
+- argument_2.md (20年对比)
+- argument_3.md (实力底气)
+- conclusion.md (结尾升华)
+
+总字数: 2450字`
+            },
+            step5: {
+                title: "风格检查报告",
+                content: `风格相似度检查:
+- intro.md: 94%
+- argument_1.md: 92%
+- argument_2.md: 95%
+- argument_3.md: 93%
+- conclusion.md: 96%
+
+整体相似度: 94%
+风格一致性: ✅ 优秀`
+            },
+            step6: {
+                title: "最终文章",
+                content: `# 谈判桌上拿不到的东西，战场上也拿不到
+
+**摘要:** 实力决定谈判地位，这是历史铁律
+
+最近，中美双方宣布将举行新一轮经贸磋商。
+
+消息一出，网上又是一片热议。
+
+有人说这是好事，说明双方都有诚意。有人说要保持警惕，美国从来不会轻易让步。
+
+那到底该怎么看待这次磋商？
+
+1
+
+我们先看一个历史案例。
+
+1950年，朝鲜战争爆发。
+
+美军从仁川登陆，一路北进，打到鸭绿江边。麦克阿瑟狂言："圣诞节前结束战争"。
+
+但中国人民志愿军入朝作战后，战场形势逆转。
+
+第一次战役，志愿军歼敌1.5万。第二次战役，歼敌3.6万，把美军赶回三八线以南。
+
+这时候，美国开始谈判了。
+
+1951年7月，停战谈判在开城开始。但美国依然在战场上不断试探，希望通过军事压力换取谈判筹码。
+
+中国怎么回应的？
+
+第五次战役，歼敌8.2万。上甘岭战役，43天激战，美军伤亡2.5万，中国伤亡1.5万。
+
+打得美国彻底认清现实：在战场上拿不到的东西，谈判桌上也别想拿到。
+
+1953年7月27日，《朝鲜停战协定》签署，战线稳定在三八线附近。
+
+这个案例说明了什么？
+
+**谈判的筹码，来自实力。**
+
+2
+
+再看一个对比。
+
+1993年，美国指控中国"银河号"货轮运输化学武器原料到伊朗。
+
+美国海军在公海上拦截"银河号"，要求登船检查。
+
+中国当时实力有限，只能同意检查。最终美国一无所获，但这个耻辱深深刻在每个中国人心里。
+
+再看2016年，南海仲裁案。
+
+美国派航母来南海示威，想通过军事压力逼中国让步。
+
+但这次，中国的回应完全不同：
+
+"中国在南海的领土主权和海洋权益在任何情况下不受所谓仲裁裁决的影响。"
+
+美国航母来了，中国照样在南海岛礁上施工建设。
+
+最后，美国悄悄撤了，仲裁案成了一张废纸。
+
+20多年时间，中国的应对方式为什么截然不同？
+
+**因为实力变了。**
+
+3
+
+回到这次中美经贸磋商。
+
+有人担心，中国会不会让步太多？会不会重蹈当年的覆辙？
+
+我的回答是：不会。
+
+为什么？
+
+因为今天的中国，已经不是40年前的中国。
+
+2024年，中国GDP达到126万亿人民币，是美国的70%。制造业规模是美国的1.5倍，是美国、日本、德国总和。
+
+中国有全球最完整的工业体系，有14亿人口的超大市场，有每年900万大学生的人才储备。
+
+更重要的是，中国有战略定力。
+
+不是说中国不想谈，而是中国不怕谈崩。
+
+**因为我们有底气。**
+
+历史一次次证明：当你软弱时，对手只会得寸进尺；当你强大时，对手才会尊重你。
+
+朝鲜战争如此，南海对峙如此，这次经贸磋商也必然如此。
+
+中国会谈，但绝不会乞求。会妥协，但绝不会投降。
+
+因为我们早就明白一个道理：
+
+**谈判桌上拿不到的东西，战场上也拿不到；战场上拿不到的东西，谈判桌上更拿不到。**
+
+实力，才是唯一的通行证。
+
+---
+
+💡 文章创作完成，共2450字`
+            }
+        };
+
+        // 切换流程面板
+        function toggleProcess() {
+            processVisible = !processVisible;
+            const sidebar = document.getElementById('processSidebar');
+            if (processVisible) {
+                sidebar.classList.remove('collapsed');
+            } else {
+                sidebar.classList.add('collapsed');
+            }
+        }
+
+        // 切换预览面板
+        function togglePreview() {
+            previewVisible = !previewVisible;
+            const panel = document.getElementById('previewPanel');
+            if (previewVisible) {
+                panel.classList.remove('collapsed');
+            } else {
+                panel.classList.add('collapsed');
+            }
+        }
+
+        // 切换步骤展开/收起
+        function toggleStep(stepIndex) {
+            const step = document.getElementById(`step${stepIndex}`);
+            step.classList.toggle('expanded');
+        }
+
+        // 更新步骤状态
+        function updateStepStatus(stepIndex, status, content) {
+            const step = document.getElementById(`step${stepIndex}`);
+            const statusSpan = step.querySelector('.process-step-status');
+            const previewDiv = step.querySelector('.process-step-preview');
+
+            // 移除旧状态
+            step.classList.remove('pending', 'active', 'completed');
+            statusSpan.classList.remove('pending', 'active', 'completed');
+
+            // 添加新状态
+            step.classList.add(status);
+            statusSpan.classList.add(status);
+
+            // 更新文字
+            if (status === 'active') {
+                statusSpan.textContent = '进行中';
+            } else if (status === 'completed') {
+                statusSpan.textContent = '已完成';
+            } else {
+                statusSpan.textContent = '等待中';
+            }
+
+            // 更新内容
+            if (content) {
+                previewDiv.textContent = content;
+                step.classList.add('expanded');
+            }
+        }
+
+        // 更新编辑器
+        function updateEditor(content) {
+            const editor = document.getElementById('editor');
+            const emptyState = document.getElementById('editorEmpty');
+
+            emptyState.style.display = 'none';
+            editor.style.display = 'block';
+            editor.value = content;
+
+            updatePreview();
+        }
+
+        // 更新预览
+        function updatePreview() {
+            const editor = document.getElementById('editor');
+            const preview = document.getElementById('preview');
+            const content = editor.value;
+
+            // 简单的Markdown渲染
+            let html = content
+                .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+                .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+                .replace(/^\*\*摘要:\*\* (.+)$/gm, '<p><strong>摘要:</strong> $1</p>')
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                .replace(/^(\d+)$/gm, '<h2 style="text-align: center; color: #999;">$1</h2>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/^(?!<h|<p)(.+)$/gm, '<p>$1</p>');
+
+            preview.innerHTML = html;
+        }
+
+        // 开始创作
+        async function startCreation() {
+            if (isCreating) return;
+
+            isCreating = true;
+            const startBtn = document.getElementById('startBtn');
+            startBtn.disabled = true;
+            startBtn.innerHTML = '<span>⏳</span><span>创作中...</span>';
+
+            const processStatusText = document.getElementById('processStatusText');
+            const editorStatus = document.getElementById('editorStatus');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const loadingText = document.getElementById('loadingText');
+            const loadingDesc = document.getElementById('loadingDesc');
+
+            // 步骤0: 热点素材搜索
+            processStatusText.textContent = '正在搜索热点素材...';
+            editorStatus.textContent = '素材搜索中';
+            loadingOverlay.classList.add('active');
+            loadingText.textContent = '正在搜索热点素材...';
+            loadingDesc.textContent = '调用Coze API深度调研';
+            updateStepStatus(0, 'active');
+            await sleep(3000);
+            updateStepStatus(0, 'completed', mockData.step0.content);
+            loadingOverlay.classList.remove('active');
+
+            // 步骤1: 选题分析
+            processStatusText.textContent = '正在分析选题策略...';
+            editorStatus.textContent = '选题分析中';
+            loadingOverlay.classList.add('active');
+            loadingText.textContent = '正在分析选题策略...';
+            loadingDesc.textContent = 'TopicAnalyzer 分析中';
+            updateStepStatus(1, 'active');
+            await sleep(2500);
+            updateStepStatus(1, 'completed', mockData.step1.content);
+            loadingOverlay.classList.remove('active');
+
+            // 步骤2: 深度素材收集
+            processStatusText.textContent = '正在收集深度素材...';
+            editorStatus.textContent = '素材收集中';
+            loadingOverlay.classList.add('active');
+            loadingText.textContent = '正在收集深度素材...';
+            loadingDesc.textContent = 'MaterialHunter 收集中';
+            updateStepStatus(2, 'active');
+            await sleep(3500);
+            updateStepStatus(2, 'completed', mockData.step2.content);
+            loadingOverlay.classList.remove('active');
+
+            // 步骤3: 观点策略设计
+            processStatusText.textContent = '正在设计观点策略...';
+            editorStatus.textContent = '观点设计中';
+            loadingOverlay.classList.add('active');
+            loadingText.textContent = '正在设计观点策略...';
+            loadingDesc.textContent = 'ViewpointStrategist 设计中';
+            updateStepStatus(3, 'active');
+            await sleep(2500);
+            updateStepStatus(3, 'completed', mockData.step3.content);
+            loadingOverlay.classList.remove('active');
+
+            // 步骤4: 观点卡片创作
+            processStatusText.textContent = '正在创作观点卡片...';
+            editorStatus.textContent = '卡片创作中';
+            loadingOverlay.classList.add('active');
+            loadingText.textContent = '正在创作观点卡片...';
+            loadingDesc.textContent = 'CardCreator 创作中';
+            updateStepStatus(4, 'active');
+            await sleep(4000);
+            updateStepStatus(4, 'completed', mockData.step4.content);
+            loadingOverlay.classList.remove('active');
+
+            // 步骤5: 风格克隆
+            processStatusText.textContent = '正在进行风格克隆...';
+            editorStatus.textContent = '风格克隆中';
+            loadingOverlay.classList.add('active');
+            loadingText.textContent = '正在进行风格克隆...';
+            loadingDesc.textContent = 'StyleCloner 克隆中';
+            updateStepStatus(5, 'active');
+            await sleep(2000);
+            updateStepStatus(5, 'completed', mockData.step5.content);
+            loadingOverlay.classList.remove('active');
+
+            // 步骤6: 文章组装
+            processStatusText.textContent = '正在组装最终文章...';
+            editorStatus.textContent = '文章组装中';
+            loadingOverlay.classList.add('active');
+            loadingText.textContent = '正在组装最终文章...';
+            loadingDesc.textContent = 'ArticleWeaver 组装中';
+            updateStepStatus(6, 'active');
+            await sleep(2500);
+            updateStepStatus(6, 'completed', mockData.step6.content);
+            loadingOverlay.classList.remove('active');
+
+            // 完成
+            processStatusText.textContent = '✅ 创作完成！';
+            editorStatus.textContent = '创作完成';
+            editorStatus.style.background = '#f6ffed';
+            editorStatus.style.color = '#52c41a';
+
+            // 显示最终文章
+            updateEditor(mockData.step6.content);
+
+            // 恢复按钮
+            startBtn.disabled = false;
+            startBtn.innerHTML = '<span>🔄</span><span>重新创作</span>';
+            isCreating = false;
+
+            alert('🎉 AI创作完成！\n\n最终文章已生成到编辑区，你可以继续修改编辑。');
+        }
+
+        // 辅助函数: 延迟
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // 编辑器实时预览
+        const editor = document.getElementById('editor');
+        editor.addEventListener('input', updatePreview);
+
+        // 历史记录切换
+        document.querySelectorAll('.history-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.history-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        console.log('✅ AI创作编辑器V5已加载 - 完整流程可视化');
+        console.log('💡 完整创作流程:');
+        console.log('1. 左侧历史面板查看历史记录');
+        console.log('2. 点击中间"开始AI创作"按钮');
+        console.log('3. AI自动执行7个步骤，实时展示进度');
+        console.log('4. 每个步骤的中间产物都可以点击查看');
+        console.log('5. 最终文章生成到编辑区，可继续编辑');
+        console.log('6. 右侧预览区实时预览排版效果');
+    </script>
+</body>
+</html>
