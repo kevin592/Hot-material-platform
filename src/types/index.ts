@@ -44,45 +44,6 @@ export interface ApiResponse {
   searchId: string;
 }
 
-// 标题库相关类型
-export interface TitleElement {
-  text: string;
-  category: string;
-  explain: string;
-}
-
-export interface TitleItem {
-  id: number;
-  title: string;
-  source: string;
-  status: 'pending' | 'approved';
-  psychology: string[];
-  elements: TitleElement[];
-  routine: string;
-  scenario: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Element {
-  id: number;
-  text: string;
-  category: string;
-  explain: string;
-  examples: string[];
-  usage: number;
-  effectiveness: number;
-  tags: string[];
-  created_at: string;
-  updated_at: string;
-}
-
-export interface GeneratedTitle {
-  title: string;
-  usedElements: string[];
-  reason: string;
-}
-
 // 筛选条件类型
 export interface FilterParams {
   platform?: string;

@@ -11,13 +11,11 @@ import {
   WechatOutlined,
   TeamOutlined,
   BulbFilled,
-  TagOutlined,
   FileTextOutlined
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import ContentListPage from './pages/ContentListPage';
 import EditorPage from './pages/EditorPage';
-import TitleLibraryPage from './pages/TitleLibraryPage';
 import './App.css';
 
 const { Header, Sider, Content } = Layout;
@@ -185,11 +183,6 @@ const App: React.FC = () => {
       label: '金句库',
     },
     {
-      key: 'title-library',
-      icon: <TagOutlined />,
-      label: '标题知识库',
-    },
-    {
       key: 'content-templates',
       icon: <FileTextOutlined />,
       label: '内容模板',
@@ -222,8 +215,6 @@ const App: React.FC = () => {
         return <PlaceholderPage title="作者库" />;
       case 'golden-sentences':
         return <PlaceholderPage title="金句库" />;
-      case 'title-library':
-        return <TitleLibraryPage />;
       case 'content-templates':
         return <PlaceholderPage title="内容模板" />;
       default:

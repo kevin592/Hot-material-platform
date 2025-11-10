@@ -29,18 +29,6 @@ export default defineConfig({
         target: 'http://localhost:3001',
         changeOrigin: true,
       },
-      '/api/titles': {
-        target: 'http://localhost:3001',
-        changeOrigin: true,
-      },
-      '/api/elements': {
-        target: 'http://localhost:3001',
-        changeOrigin: true,
-      },
-      '/api/generate': {
-        target: 'http://localhost:3001',
-        changeOrigin: true,
-      },
       '/api/health': {
         target: 'http://localhost:3001',
         changeOrigin: true,
