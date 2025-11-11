@@ -16,6 +16,7 @@ import {
 import type { MenuProps } from 'antd';
 import ContentListPage from './pages/ContentListPage';
 import EditorPage from './pages/EditorPage';
+import AuthorLibraryPage from './pages/AuthorLibraryPage';
 import './App.css';
 
 const { Header, Sider, Content } = Layout;
@@ -212,7 +213,7 @@ const App: React.FC = () => {
       case 'wechat-accounts':
         return <PlaceholderPage title="公众号账号管理" />;
       case 'author-library':
-        return <PlaceholderPage title="作者库" />;
+        return <AuthorLibraryPage />;
       case 'golden-sentences':
         return <PlaceholderPage title="金句库" />;
       case 'content-templates':

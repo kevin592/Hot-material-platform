@@ -22,19 +22,27 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       '/api/upload': {
-        target: 'http://localhost:3001',
+        target: 'http://localhost:3006',
         changeOrigin: true,
       },
       '/uploads': {
-        target: 'http://localhost:3001',
+        target: 'http://localhost:3006',
         changeOrigin: true,
       },
       '/api/health': {
-        target: 'http://localhost:3001',
+        target: 'http://localhost:3006',
         changeOrigin: true,
       },
       '/api/hots': {
-        target: 'http://localhost:3001',
+        target: 'http://localhost:3006',
+        changeOrigin: true,
+      },
+      '/api/authors': {
+        target: 'http://localhost:3006',
+        changeOrigin: true,
+      },
+      '/api/config': {
+        target: 'http://localhost:3006',
         changeOrigin: true,
       }
     }
